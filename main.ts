@@ -605,24 +605,6 @@ namespace motor {
         }
 
         if (direction == 3) {
-            // M1 backward
-            setPwm(7, 0, 0);
-            setPwm(6, 0, speed);
-
-            // M2 backward
-            setPwm(5, 0, 0);
-            setPwm(4, 0, speed);
-
-            // M3 backward
-            setPwm(3, 0, 0);
-            setPwm(2, 0, speed);
-
-            // M4 backward
-            setPwm(1, 0, 0);
-            setPwm(0, 0, speed);
-        }
-
-        if (direction == 4) {
             // M1 foward
             setPwm(7, 0, speed);
             setPwm(6, 0, 0);
@@ -638,6 +620,24 @@ namespace motor {
             // M4 backward
             setPwm(1, 0, speed);
             setPwm(0, 0, 0);
+        }
+
+        if (direction == 4) {
+            // M1 backward
+            setPwm(7, 0, 0);
+            setPwm(6, 0, speed);
+
+            // M2 backward
+            setPwm(5, 0, 0);
+            setPwm(4, 0, speed);
+
+            // M3 backward
+            setPwm(3, 0, 0);
+            setPwm(2, 0, speed);
+
+            // M4 backward
+            setPwm(1, 0, 0);
+            setPwm(0, 0, speed);
         }
     }
 
