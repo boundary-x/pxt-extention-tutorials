@@ -333,22 +333,170 @@ namespace motor {
         if (speed <= -4096) {
             speed = -4095
         }
+        // motor controll
+        // 1  2  3  |  ↖️  ↑  ↗
+        // 4  5  6  |  ←   s  →
+        // 7  8  9  |  ↙  ↓  ↘
+        if (direction == 1) {
+            // M1 foward
+            setPwm(7, 0, speed); 
+            setPwm(6, 0, 0);     
+
+            // M2 stop
+            setPwm(5, 0, 0); 
+            setPwm(4, 0, 0);        
+
+            // M3 foward
+            setPwm(3, 0, 0); 
+            setPwm(2, 0, speed);        
+
+            // M4 stop
+            setPwm(1, 0, 0); 
+            setPwm(0, 0, 0);        
+        }
+
         if (direction == 2) {
-            // Set PWM for M1
-            setPwm(7, 0, speed); // PP for M1
-            setPwm(6, 0, 0);        // PN for M1
+            // M1 foward
+            setPwm(7, 0, speed); 
+            setPwm(6, 0, 0);        
 
-            // Set PWM for M2
-            setPwm(5, 0, speed); // PP for M2
-            setPwm(4, 0, 0);        // PN for M2
+            // M2 foward
+            setPwm(5, 0, speed); 
+            setPwm(4, 0, 0);      
 
-            // Set PWM for M3
-            setPwm(3, 0, 0); // PP for M3
-            setPwm(2, 0, speed);        // PN for M3
+            // M3 foward
+            setPwm(3, 0, 0); 
+            setPwm(2, 0, speed); 
 
-            // Set PWM for M4
-            setPwm(1, 0, 0); // PP for M4
-            setPwm(0, 0, speed);        // PN for M4
+            // M4 foward
+            setPwm(1, 0, 0);
+            setPwm(0, 0, speed);
+        }
+
+        if (direction == 3) {
+            // M1 stop
+            setPwm(7, 0, 0); 
+            setPwm(6, 0, 0);        
+
+            // M2 foward
+            setPwm(5, 0, speed); 
+            setPwm(4, 0, 0);        
+
+            // M3 stop
+            setPwm(3, 0, 0); 
+            setPwm(2, 0, 0);        
+
+            // M4 foward
+            setPwm(1, 0, 0); 
+            setPwm(0, 0, speed);
+        }
+
+        if (direction == 4) {
+            // M1 foward
+            setPwm(7, 0, speed);
+            setPwm(6, 0, 0);
+
+            // M2 backward
+            setPwm(5, 0, 0);
+            setPwm(4, 0, speed); 
+
+            // M3 foward
+            setPwm(3, 0, 0);
+            setPwm(2, 0, speed);
+
+            // M4 backward
+            setPwm(1, 0, speed);
+            setPwm(0, 0, 0);
+        }
+
+        if (direction == 5) {
+            // M1 stop
+            setPwm(7, 0, 0);
+            setPwm(6, 0, 0);
+
+            // M2 stop
+            setPwm(5, 0, 0);
+            setPwm(4, 0, 0);
+
+            // M3 stop
+            setPwm(3, 0, 0);
+            setPwm(2, 0, 0);
+
+            // M4 stop
+            setPwm(1, 0, 0);
+            setPwm(0, 0, 0);
+        }
+
+        if (direction == 6) {
+            // M1 backward
+            setPwm(7, 0, 0); 
+            setPwm(6, 0, speed); 
+
+            // M2 foward
+            setPwm(5, 0, speed); 
+            setPwm(4, 0, 0);
+
+            // M3 backward
+            setPwm(3, 0, speed);
+            setPwm(2, 0, 0); 
+
+            // M4 foward
+            setPwm(1, 0, 0);
+            setPwm(0, 0, speed);
+        }
+
+        if (direction == 7) {
+            // M1 stop
+            setPwm(7, 0, 0);
+            setPwm(6, 0, 0);
+
+            // M2 backward
+            setPwm(5, 0, 0);
+            setPwm(4, 0, speed);
+
+            // M3 stop
+            setPwm(3, 0, 0);
+            setPwm(2, 0, 0);
+
+            // M4 backward
+            setPwm(1, 0, speed);
+            setPwm(0, 0, 0);
+        }
+
+        if (direction == 8) {
+            // M1 backward
+            setPwm(7, 0, 0);
+            setPwm(6, 0, speed);
+
+            // M2 backward
+            setPwm(5, 0, 0);
+            setPwm(4, 0, speed);
+
+            // M3 backward
+            setPwm(3, 0, speed);
+            setPwm(2, 0, 0);
+
+            // M4 backward
+            setPwm(1, 0, speed);
+            setPwm(0, 0, 0);
+        }
+
+        if (direction == 9) {
+            // M1 backward
+            setPwm(7, 0, 0);
+            setPwm(6, 0, speed);
+
+            // M2 stop
+            setPwm(5, 0, 0);
+            setPwm(4, 0, 0);
+
+            // M3 backward
+            setPwm(3, 0, speed);
+            setPwm(2, 0, 0);
+
+            // M4 stop
+            setPwm(1, 0, 0);
+            setPwm(0, 0, 0);
         }
     }
 
