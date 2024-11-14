@@ -324,27 +324,31 @@ namespace motor {
         if (!initialized) {
             initPCA9685()
         }
+
         speed = speed * 16; // map 255 to 4096
+
         if (speed >= 4096) {
             speed = 4095
         }
         if (speed <= -4096) {
             speed = -4095
         }
-
         if (direction == 2) {
-            //m1
-            setPwm(7, 0, speed)
-            setPwm(6, 0, 0
-            //m2
-            setPwm(5, 0, speed)
-            setPwm(4, 0, 0
-            //m3
-            setPwm(3, 0, 0)
-            setPwm(2, 0, speed)
-            //m4
-            setPwm(1, 0, 0)
-            setPwm(0, 0, speed)
+            // Set PWM for M1
+            setPwm(7, 0, speed); // PP for M1
+            setPwm(6, 0, 0);        // PN for M1
+
+            // Set PWM for M2
+            setPwm(5, 0, speed); // PP for M2
+            setPwm(4, 0, 0);        // PN for M2
+
+            // Set PWM for M3
+            setPwm(3, 0, 0); // PP for M3
+            setPwm(2, 0, speed);        // PN for M3
+
+            // Set PWM for M4
+            setPwm(1, 0, 0); // PP for M4
+            setPwm(0, 0, speed);        // PN for M4
         }
     }
 
