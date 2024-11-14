@@ -1,3 +1,4 @@
+
 /*！
  * @file pxt-motor/main.ts
  * @brief DFRobot's microbit motor drive makecode library.
@@ -16,7 +17,8 @@
 /**
  *This is DFRobot:motor user motor and steering control function.
  */
-//% weight=10 color=#58ACFA icon="\uf057" block="boundary-X"
+//% weight=10 color=#58ACFA icon="\uf057" block="Pony Bot"
+//% groups="['서보모터 제어', '모터 제어(기초)','모터 제어(심화)']"
 namespace motor {
     const PCA9685_ADDRESS = 0x40
     const MODE1 = 0x00
@@ -81,6 +83,20 @@ namespace motor {
         bb = 8,
         //% block="↘"
         rb = 9
+    }
+
+    /** 
+    * The user can choose the mobility controll
+    */
+    export enum DirControll {
+        //% block="↑"
+        foward = 1,
+        //% block="↓"
+        backward = 2,
+        //% block="↷"
+        CWRotate = 3,
+        //% block="↶"
+        CCWRotate = 4,
     }
 
     /**
@@ -258,9 +274,10 @@ namespace motor {
      * 0°~180°.
     */
     //% blockId=motor_servo block="|%index|서보모터|%degree|각도로 이동"
-    //% weight=100
+    //% weight=0
     //% degree.min=0 degree.max=180
     //% index.fieldEditor="gridpicker" index.fieldOptions.columns=4
+    //% group="서보모터 제어"
     export function servo(index: Servos, degree: number): void {
         if (!initialized) {
             initPCA9685()
@@ -276,11 +293,12 @@ namespace motor {
      * M1~M4.
      * speed(0~255).
     */
-    //% weight=90
+    //% weight=0
     //% blockId=motor_MotorRun block="|%index|모터|%Dir|방향|%speed|속도로 회전"
     //% speed.min=0 speed.max=255
     //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
+    //% group="모터 제어(심화)"
     export function MotorRun(index: Motors, direction: Dir, speed: number): void {
 
         if (!initialized) {
@@ -316,10 +334,11 @@ namespace motor {
      * M1~M4.
      * speed(0~255).
     */
-    //% weight=80
+    //% weight=0
     //% blockId=motor_MecanumRun block="|메카넘|%Mecanum|방향|%speed|속도로 이동"
     //% speed.min=0 speed.max=255
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=3
+    //% group="모터 제어(기초)"
     export function MecanumRun(direction: Mecanum, speed: number): void {
         if (!initialized) {
             initPCA9685()
@@ -339,34 +358,34 @@ namespace motor {
         // 7  8  9  |  ↙  ↓  ↘
         if (direction == 1) {
             // M1 foward
-            setPwm(7, 0, speed); 
-            setPwm(6, 0, 0);     
+            setPwm(7, 0, speed);
+            setPwm(6, 0, 0);
 
             // M2 stop
-            setPwm(5, 0, 0); 
-            setPwm(4, 0, 0);        
+            setPwm(5, 0, 0);
+            setPwm(4, 0, 0);
 
             // M3 foward
-            setPwm(3, 0, 0); 
-            setPwm(2, 0, speed);        
+            setPwm(3, 0, 0);
+            setPwm(2, 0, speed);
 
             // M4 stop
-            setPwm(1, 0, 0); 
-            setPwm(0, 0, 0);        
+            setPwm(1, 0, 0);
+            setPwm(0, 0, 0);
         }
 
         if (direction == 2) {
             // M1 foward
-            setPwm(7, 0, speed); 
-            setPwm(6, 0, 0);        
+            setPwm(7, 0, speed);
+            setPwm(6, 0, 0);
 
             // M2 foward
-            setPwm(5, 0, speed); 
-            setPwm(4, 0, 0);      
+            setPwm(5, 0, speed);
+            setPwm(4, 0, 0);
 
             // M3 foward
-            setPwm(3, 0, 0); 
-            setPwm(2, 0, speed); 
+            setPwm(3, 0, 0);
+            setPwm(2, 0, speed);
 
             // M4 foward
             setPwm(1, 0, 0);
@@ -375,19 +394,19 @@ namespace motor {
 
         if (direction == 3) {
             // M1 stop
-            setPwm(7, 0, 0); 
-            setPwm(6, 0, 0);        
+            setPwm(7, 0, 0);
+            setPwm(6, 0, 0);
 
             // M2 foward
-            setPwm(5, 0, speed); 
-            setPwm(4, 0, 0);        
+            setPwm(5, 0, speed);
+            setPwm(4, 0, 0);
 
             // M3 stop
-            setPwm(3, 0, 0); 
-            setPwm(2, 0, 0);        
+            setPwm(3, 0, 0);
+            setPwm(2, 0, 0);
 
             // M4 foward
-            setPwm(1, 0, 0); 
+            setPwm(1, 0, 0);
             setPwm(0, 0, speed);
         }
 
@@ -398,7 +417,7 @@ namespace motor {
 
             // M2 backward
             setPwm(5, 0, 0);
-            setPwm(4, 0, speed); 
+            setPwm(4, 0, speed);
 
             // M3 foward
             setPwm(3, 0, 0);
@@ -429,16 +448,16 @@ namespace motor {
 
         if (direction == 6) {
             // M1 backward
-            setPwm(7, 0, 0); 
-            setPwm(6, 0, speed); 
+            setPwm(7, 0, 0);
+            setPwm(6, 0, speed);
 
             // M2 foward
-            setPwm(5, 0, speed); 
+            setPwm(5, 0, speed);
             setPwm(4, 0, 0);
 
             // M3 backward
             setPwm(3, 0, speed);
-            setPwm(2, 0, 0); 
+            setPwm(2, 0, 0);
 
             // M4 foward
             setPwm(1, 0, 0);
@@ -503,9 +522,10 @@ namespace motor {
     /**
      * Stop the dc motor.
     */
-    //% weight=20
+    //% weight=0
     //% blockId=motor_motorStop block="|%index|모터 정지"
     //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2 
+    //% group="모터 제어(심화)"
     export function motorStop(index: Motors) {
         setPwm((4 - index) * 2, 0, 0);
         setPwm((4 - index) * 2 + 1, 0, 0);
@@ -514,11 +534,111 @@ namespace motor {
     /**
      * Stop all motors
     */
-    //% weight=10
+    //% weight=20
     //% blockId=motor_motorStopAll block="|모든 모터 정지"
+    //% group="모터 제어(기초)"
     export function motorStopAll(): void {
         for (let idx = 1; idx <= 4; idx++) {
             motorStop(idx);
         }
     }
+
+    /**
+        * noraml mode controll
+        * M1~M4.
+        * speed(0~255).
+       */
+    //% weight=0
+    //% blockId=motor_NormalRun block="|포니봇|%Mecanum|방향|%speed|속도로 이동"
+    //% speed.min=0 speed.max=255
+    //% DirControll.fieldEditor="gridpicker" DirControll.fieldOptions.columns=2
+    //% group="모터 제어(기초)"
+    export function NomalRun(direction: DirControll, speed: number): void {
+        if (!initialized) {
+            initPCA9685()
+        }
+
+        speed = speed * 16; // map 255 to 4096
+
+        if (speed >= 4096) {
+            speed = 4095
+        }
+        if (speed <= -4096) {
+            speed = -4095
+        }
+
+        if (direction == 1) {
+            // M1 foward
+            setPwm(7, 0, speed);
+            setPwm(6, 0, 0);
+
+            // M2 foward
+            setPwm(5, 0, speed);
+            setPwm(4, 0, 0);
+
+            // M3 foward
+            setPwm(3, 0, 0);
+            setPwm(2, 0, speed);
+
+            // M4 foward
+            setPwm(1, 0, 0);
+            setPwm(0, 0, speed);
+        }
+
+
+        if (direction == 2) {
+            // M1 backward
+            setPwm(7, 0, 0);
+            setPwm(6, 0, speed);
+
+            // M2 backward
+            setPwm(5, 0, 0);
+            setPwm(4, 0, speed);
+
+            // M3 backward
+            setPwm(3, 0, speed);
+            setPwm(2, 0, 0);
+
+            // M4 backward
+            setPwm(1, 0, speed);
+            setPwm(0, 0, 0);
+        }
+
+        if (direction == 3) {
+            // M1 foward
+            setPwm(7, 0, speed);
+            setPwm(6, 0, 0);
+
+            // M2 foward
+            setPwm(5, 0, speed);
+            setPwm(4, 0, 0);
+
+            // M3 backward
+            setPwm(3, 0, speed);
+            setPwm(2, 0, 0);
+
+            // M4 backward
+            setPwm(1, 0, speed);
+            setPwm(0, 0, 0);
+        }
+
+        if (direction == 4) {
+            // M1 backward
+            setPwm(7, 0, 0);
+            setPwm(6, 0, speed);
+
+            // M2 backward
+            setPwm(5, 0, 0);
+            setPwm(4, 0, speed);
+
+            // M3 backward
+            setPwm(3, 0, 0);
+            setPwm(2, 0, speed);
+
+            // M4 backward
+            setPwm(1, 0, 0);
+            setPwm(0, 0, speed);
+        }
+    }
+
 }
