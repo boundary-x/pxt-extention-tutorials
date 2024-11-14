@@ -93,9 +93,9 @@ namespace motor {
         foward = 1,
         //% block="↓"
         backward = 2,
-        //% block="↷"
-        CWRotate = 3,
         //% block="↶"
+        CWRotate = 3,
+        //% block="↷"
         CCWRotate = 4,
     }
 
