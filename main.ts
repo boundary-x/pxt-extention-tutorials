@@ -97,9 +97,9 @@ namespace motor {
      * The user defines the motor rotation direction.
      */
     export enum Dir {
-        //% blockId="CW" block="CW"
+        //% blockId="정회전" block="정회전"
         CW = 1,
-        //% blockId="CCW" block="CCW"
+        //% blockId="역회전" block="역회전"
         CCW = -1,
     }
 
@@ -253,14 +253,20 @@ namespace motor {
      * speed(0~255).
     */
     //% weight=90
-    //% blockId=motor_MotorRun block="Motor|%index|dir|%Dir|speed|%speed"
+    //% blockId=motor_MotorRun block="|%index|모터|%Dir|방향|%speed|속도로 회전"
     //% speed.min=0 speed.max=255
     //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
     export function MotorRun(index: Motors, direction: Dir, speed: number): void {
+
         if (!initialized) {
             initPCA9685()
         }
+
+        if (index === 3 || index === 4) {
+            direction = direction * -1;
+        }
+
         speed = speed * 16 * direction; // map 255 to 4096
         if (speed >= 4096) {
             speed = 4095
