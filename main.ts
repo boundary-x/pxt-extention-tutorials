@@ -1,4 +1,5 @@
-namespace motor {
+//% weight=10 color=#58ACFA icon="\uf057" block="Pony Bot"
+namespace ponyBot {
     const PCA9685_ADDRESS = 0x40
     const MODE1 = 0x00
     const MODE2 = 0x01
@@ -130,7 +131,30 @@ namespace motor {
         M3_M4 = 0x2
     }
 
+    export enum twoLineState {
+        //% block="◌ ◌ " 
+        two_line_State_0 = 0,
+        //% block="● ●" 
+        two_line_State_1 = 1,
+        //% block="● ◌" 
+        two_line_State_2 = 2,
+        //% block="◌ ●" 
+        two_line_State_3 = 3,
+    }
 
+    export enum lineState {
+        //% block="◌" 
+        line_State_0 = 0,
+        //% block="●" 
+        line_State_1 = 1
+    }
+
+    export enum lineSensorChannel {
+        //% block="왼쪽"
+        reft = 1,
+        //% block="오른쪽"
+        right = 2,
+    }
 
     let initialized = false
 
@@ -620,4 +644,51 @@ namespace motor {
         }
     }
 
+    //% blockId="check_two_line_state"
+    //% block="두 라인 센서의 값이 %state"
+    //% state.shadow="dropdown"
+    //% group="라인 감지"
+    //% weight=0
+    export function checkTwoLineState(state: twoLineState): boolean {
+        const leftSensor = pins.digitalReadPin(DigitalPin.P16);
+        const rightSensor = pins.digitalReadPin(DigitalPin.P15);
+
+        switch (state) {
+            case twoLineState.two_line_State_0:
+                return leftSensor === 0 && rightSensor === 0;
+            case twoLineState.two_line_State_1:
+                return leftSensor === 1 && rightSensor === 1;
+            case twoLineState.two_line_State_2:
+                return leftSensor === 1 && rightSensor === 0;
+            case twoLineState.two_line_State_3:
+                return leftSensor === 0 && rightSensor === 1;
+            default:
+                return false;
+        }
+    }
+
+    //% blockId="check_single_line_sensor"
+    //% block="%channel 라인 센서의 값이 %state"
+    //% channel.shadow="dropdown"
+    //% state.shadow="dropdown"
+    //% group="라인 감지"
+    //% weight=0
+    export function checkSingleLineSensor(channel: lineSensorChannel, state: lineState): boolean {
+        const sensorValue = channel === lineSensorChannel.reft
+            ? pins.digitalReadPin(DigitalPin.P16)
+            : pins.digitalReadPin(DigitalPin.P15);
+
+        return sensorValue === state;
+    }
+
+    //% blockId="read_line_sensor"
+    //% block="%channel 라인 센서 값 읽기"
+    //% channel.shadow="dropdown"
+    //% group="라인 감지"
+    //% weight=0
+    export function readLineSensor(channel: lineSensorChannel): number {
+        return channel === lineSensorChannel.reft
+            ? pins.digitalReadPin(DigitalPin.P16)
+            : pins.digitalReadPin(DigitalPin.P15);
+    }
 }
