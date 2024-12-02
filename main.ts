@@ -156,6 +156,15 @@ namespace ponyBot {
         right = 2,
     }
 
+    export enum PingUnit {
+        //% block="마이크로초"
+        MicroSeconds,
+        //% block="센티미터"
+        Centimeters,
+        //% block="인치"
+        Inches
+    }
+
     let initialized = false
 
     function i2cWrite(addr: number, reg: number, value: number) {
@@ -647,7 +656,7 @@ namespace ponyBot {
     //% blockId="check_two_line_state"
     //% block="두 라인 센서의 값이 %state"
     //% state.shadow="dropdown"
-    //% group="라인 감지"
+    //% group="라인 감지 센서"
     //% weight=0
     export function checkTwoLineState(state: twoLineState): boolean {
         const leftSensor = pins.digitalReadPin(DigitalPin.P16);
@@ -671,7 +680,7 @@ namespace ponyBot {
     //% block="%channel 라인 센서의 값이 %state"
     //% channel.shadow="dropdown"
     //% state.shadow="dropdown"
-    //% group="라인 감지"
+    //% group="라인 감지 센서"
     //% weight=0
     export function checkSingleLineSensor(channel: lineSensorChannel, state: lineState): boolean {
         const sensorValue = channel === lineSensorChannel.reft
@@ -684,11 +693,38 @@ namespace ponyBot {
     //% blockId="read_line_sensor"
     //% block="%channel 라인 센서 값 읽기"
     //% channel.shadow="dropdown"
-    //% group="라인 감지"
+    //% group="라인 감지 센서"
     //% weight=0
     export function readLineSensor(channel: lineSensorChannel): number {
         return channel === lineSensorChannel.reft
             ? pins.digitalReadPin(DigitalPin.P16)
             : pins.digitalReadPin(DigitalPin.P15);
     }
+
+    //% blockId=sonar_ping 
+    //% block="%unit 단위로 측정한 거리"
+    //% unit.shadow="dropdown"
+    //% group="거리 감지 센서"
+    //% weight=0
+    export function ping(unit: PingUnit, maxCmDistance = 500): number {
+        const trig = DigitalPin.P13; // Trig 핀 기본값
+        const echo = DigitalPin.P14; // Echo 핀 기본값
+        // send pulse
+        pins.setPull(trig, PinPullMode.PullNone);
+        pins.digitalWritePin(trig, 0);
+        control.waitMicros(2);
+        pins.digitalWritePin(trig, 1);
+        control.waitMicros(10);
+        pins.digitalWritePin(trig, 0);
+
+        // read pulse
+        const d = pins.pulseIn(echo, PulseValue.High, maxCmDistance * 58);
+
+        switch (unit) {
+            case PingUnit.Centimeters: return Math.idiv(d, 58);
+            case PingUnit.Inches: return Math.idiv(d, 148);
+            default: return d;
+        }
+    }
+
 }
