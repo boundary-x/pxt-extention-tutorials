@@ -1,24 +1,3 @@
-
-/*！
- * @file pxt-motor/main.ts
- * @brief DFRobot's microbit motor drive makecode library.
- * @n [Get the module here](http://www.dfrobot.com.cn/goods-1577.html)
- * @n This is the microbit special motor drive library, which realizes control 
- *    of the eight-channel steering gear, two-step motor and four-way dc motor.
- *
- * @copyright	[DFRobot](http://www.dfrobot.com), 2016
- * @copyright	GNU Lesser General Public License
- *
- * @author [email](1035868977@qq.com)
- * @version  V1.0.1
- * @date  2018-03-20
- */
-
-/**
- *This is DFRobot:motor user motor and steering control function.
- */
-//% weight=10 color=#58ACFA icon="\uf057" block="Pony Bot"
-//% groups="['서보모터 제어', '모터 제어(기초)','모터 제어(심화)']"
 namespace motor {
     const PCA9685_ADDRESS = 0x40
     const MODE1 = 0x00
@@ -65,7 +44,7 @@ namespace motor {
      * The user can choose the mecanum mode direction 
      */
     export enum Mecanum {
-        //% block="↖️"
+        //% block="↖"
         lf = 1,
         //% block="↑"
         ff = 2,
@@ -163,9 +142,9 @@ namespace motor {
     }
 
     function i2cCmd(addr: number, value: number) {
-        let buf = pins.createBuffer(1)
-        buf[0] = value
-        pins.i2cWriteBuffer(addr, buf)
+        let buf2 = pins.createBuffer(1)
+        buf2[0] = value
+        pins.i2cWriteBuffer(addr, buf2)
     }
 
     function i2cRead(addr: number, reg: number) {
@@ -200,13 +179,13 @@ namespace motor {
         if (channel < 0 || channel > 15)
             return;
 
-        let buf = pins.createBuffer(5);
-        buf[0] = LED0_ON_L + 4 * channel;
-        buf[1] = on & 0xff;
-        buf[2] = (on >> 8) & 0xff;
-        buf[3] = off & 0xff;
-        buf[4] = (off >> 8) & 0xff;
-        pins.i2cWriteBuffer(PCA9685_ADDRESS, buf);
+        let buf3 = pins.createBuffer(5);
+        buf3[0] = LED0_ON_L + 4 * channel;
+        buf3[1] = on & 0xff;
+        buf3[2] = (on >> 8) & 0xff;
+        buf3[3] = off & 0xff;
+        buf3[4] = (off >> 8) & 0xff;
+        pins.i2cWriteBuffer(PCA9685_ADDRESS, buf3);
     }
 
 
@@ -353,7 +332,7 @@ namespace motor {
             speed = -4095
         }
         // motor controll
-        // 1  2  3  |  ↖️  ↑  ↗
+        // 1  2  3  |  ↖  ↑  ↗
         // 4  5  6  |  ←   s  →
         // 7  8  9  |  ↙  ↓  ↘
         if (direction == 1) {
