@@ -41,6 +41,49 @@ namespace ponyBot {
     const BYG_CHD_L = 2047
     const BYG_CHD_H = 4095
 
+    class tcs3472 {
+        is_setup: boolean
+        addr: number
+        leds: DigitalPin
+
+        constructor(addr: number) {
+            this.is_setup = false
+            this.addr = addr
+        }
+
+        setup(): void {
+            if (this.is_setup) return
+            this.is_setup = true
+            smbus.writeByte(this.addr, 0x80, 0x03)
+            smbus.writeByte(this.addr, 0x81, 0x2b)
+        }
+
+        setIntegrationTime(time: number): void {
+            this.setup()
+            time = Math.clamp(0, 255, time * 10 / 24)
+            smbus.writeByte(this.addr, 0x81, 255 - time)
+        }
+
+        light(): number {
+            return this.raw()[0]
+        }
+
+        rgb(): number[] {
+            let result: number[] = this.raw()
+            let clear: number = result.shift()
+            for (let x: number = 0; x < result.length; x++) {
+                result[x] = result[x] * 255 / clear
+            }
+            return result
+        }
+
+        raw(): number[] {
+            this.setup()
+            let result: Buffer = smbus.readBuffer(this.addr, 0xb4, pins.sizeOf(NumberFormat.UInt16LE) * 4)
+            return smbus.unpack("HHHH", result)
+        }
+    }
+
     /** 
      * The user can choose the mecanum mode direction 
      */
@@ -163,6 +206,19 @@ namespace ponyBot {
         Centimeters,
         //% block="인치"
         Inches
+    }
+
+    export enum DetectedColor {
+        //% block="빨간색"
+        Red,
+        //% block="초록색"
+        Green,
+        //% block="파란색"
+        Blue,
+        //% block="흰색"
+        White,
+        //% block="검은색"
+        Black,
     }
 
     let initialized = false
@@ -727,4 +783,192 @@ namespace ponyBot {
         }
     }
 
+    let _tcs3472: tcs3472 = new tcs3472(0x29)
+    let calibrationMin: number[] = [0, 0, 0];
+    let calibrationMax: number[] = [255, 255, 255];
+
+    /**
+     * 컬러 센서를 캘리브레이션
+     */
+    //% blockId=color_sensor_calibrate
+    //% block="색상 감지 센서 캘리브레이션"
+    //% group="색상 감지 센서"
+    export function calibrate(): void {
+        basic.showString("W"); // 흰색 기준
+        basic.pause(3000);
+        calibrationMax = _tcs3472.rgb(); // 흰색 기준으로 최대값 설정
+
+        basic.showString("B"); // 검은색 기준
+        basic.pause(3000);
+        calibrationMin = _tcs3472.rgb(); // 검은색 기준으로 최소값 설정
+
+        basic.showIcon(IconNames.Yes); // 완료 표시
+    }
+
+    /**
+     * Get the light level
+     */
+    //% blockId=brickcell_color_tcs34725_get_light
+    //% block="밝기(B) 값 읽기"
+    //% group="색상 감지 센서"
+    export function getLight(): number {
+        return Math.round(_tcs3472.light())
+    }
+
+    /**
+     * Get the amount of red the colour sensor sees
+     */
+    //% blockId=brickcell_color_tcs34725__get_red
+    //% block="빨간색(R) 색상 값 읽기"
+    //% group="색상 감지 센서"
+    export function getRed(): number {
+        return Math.round(_tcs3472.rgb()[0])
+    }
+
+    /**
+     * Get the amount of green the colour sensor sees
+     */
+    //% blockId=brickcell_color_tcs34725_get_green
+    //% block="초록색(G) 색상 값 읽기"
+    //% group="색상 감지 센서"
+    export function getGreen(): number {
+        return Math.round(_tcs3472.rgb()[1])
+    }
+
+    /**
+     * Get the amount of blue the colour sensor sees
+     */
+    //% blockId=brickcell_color_tcs34725_get_blue
+    //% block="파란색(B) 색상 값 읽기"
+    //% group="색상 감지 센서"
+    export function getBlue(): number {
+        return Math.round(_tcs3472.rgb()[2])
+    }
+
+    /**
+     * Set the integration time of the colour sensor in ms
+     */
+    //% blockId=brickcell_color_tcs34725_set_integration_time
+    //% block="색상 통합 시간을 %time ms로 설정"
+    //% time.min=0 time.max=612 value.defl=500
+    //% group="색상 감지 센서"
+    export function setColourIntegrationTime(time: number): void {
+        return _tcs3472.setIntegrationTime(time)
+    }
+
+    /**
+     * 감지된 색상이 지정된 색상인지 확인
+     */
+    //% blockId=color_sensor_is_color
+    //% block="감지된 색상이 %color 입니까?"
+    //% group="색상 감지 센서"
+    export function isColor(color: DetectedColor): boolean {
+        const rgb = getCalibratedRGB();
+        const r = rgb[0];
+        const g = rgb[1];
+        const b = rgb[2];
+
+        const total = r + g + b;
+        if (total === 0) return false;
+
+        const normR = r / total;
+        const normG = g / total;
+        const normB = b / total;
+
+        switch (color) {
+            case DetectedColor.Red:
+                return normR > 0.5 && normG < 0.3 && normB < 0.3;
+            case DetectedColor.Green:
+                return normG > 0.5 && normR < 0.3 && normB < 0.3;
+            case DetectedColor.Blue:
+                return normB > 0.5 && normR < 0.3 && normG < 0.3;
+            case DetectedColor.White:
+                return r > 200 && g > 200 && b > 200;
+            case DetectedColor.Black:
+                return r < 50 && g < 50 && b < 50;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * 캘리브레이션된 RGB 값을 반환
+     */
+    export function getCalibratedRGB(): number[] {
+        const rawRGB = _tcs3472.rgb();
+        return normalizeRGB(rawRGB);
+    }
+
+    /**
+     * Normalize RGB values based on calibration
+     * @param rgb Raw RGB values from the sensor
+     * @returns Normalized RGB values
+     */
+    function normalizeRGB(rgb: number[]): number[] {
+        let normalized: number[] = [];
+        for (let i = 0; i < rgb.length; i++) {
+            const value = Math.clamp(0, 255,
+                ((rgb[i] - calibrationMin[i]) / (calibrationMax[i] - calibrationMin[i])) * 255
+            );
+            normalized.push(value);
+        }
+        return normalized;
+    }
+}
+
+namespace smbus {
+    export function writeByte(addr: number, register: number, value: number): void {
+        let temp = pins.createBuffer(2);
+        temp[0] = register;
+        temp[1] = value;
+        pins.i2cWriteBuffer(addr, temp, false);
+    }
+    export function writeBuffer(addr: number, register: number, value: Buffer): void {
+        let temp = pins.createBuffer(value.length + 1);
+        temp[0] = register;
+        for (let x = 0; x < value.length; x++) {
+            temp[x + 1] = value[x];
+        }
+        pins.i2cWriteBuffer(addr, temp, false);
+    }
+    export function readBuffer(addr: number, register: number, len: number): Buffer {
+        let temp = pins.createBuffer(1);
+        temp[0] = register;
+        pins.i2cWriteBuffer(addr, temp, false);
+        return pins.i2cReadBuffer(addr, len, false);
+    }
+    function readNumber(addr: number, register: number, fmt: NumberFormat = NumberFormat.UInt8LE): number {
+        let temp = pins.createBuffer(1);
+        temp[0] = register;
+        pins.i2cWriteBuffer(addr, temp, false);
+        return pins.i2cReadNumber(addr, fmt, false);
+    }
+    export function unpack(fmt: string, buf: Buffer): number[] {
+        let le: boolean = true;
+        let offset: number = 0;
+        let result: number[] = [];
+        let num_format: NumberFormat = 0;
+        for (let c = 0; c < fmt.length; c++) {
+            switch (fmt.charAt(c)) {
+                case '<':
+                    le = true;
+                    continue;
+                case '>':
+                    le = false;
+                    continue;
+                case 'c':
+                case 'B':
+                    num_format = le ? NumberFormat.UInt8LE : NumberFormat.UInt8BE; break;
+                case 'b':
+                    num_format = le ? NumberFormat.Int8LE : NumberFormat.Int8BE; break;
+                case 'H':
+                    num_format = le ? NumberFormat.UInt16LE : NumberFormat.UInt16BE; break;
+                case 'h':
+                    num_format = le ? NumberFormat.Int16LE : NumberFormat.Int16BE; break;
+            }
+            result.push(buf.getNumber(num_format, offset));
+            offset += pins.sizeOf(num_format);
+        }
+        return result;
+    }
 }
