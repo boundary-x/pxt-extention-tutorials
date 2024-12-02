@@ -822,7 +822,7 @@ namespace ponyBot {
     //% block="빨간색(R) 색상 값 읽기"
     //% group="색상 감지 센서"
     export function getRed(): number {
-        return Math.round(_tcs3472.rgb()[0])
+        return Math.round(getCalibratedRGB()[0]);
     }
 
     /**
@@ -832,7 +832,7 @@ namespace ponyBot {
     //% block="초록색(G) 색상 값 읽기"
     //% group="색상 감지 센서"
     export function getGreen(): number {
-        return Math.round(_tcs3472.rgb()[1])
+        return Math.round(getCalibratedRGB()[1]);
     }
 
     /**
@@ -842,7 +842,7 @@ namespace ponyBot {
     //% block="파란색(B) 색상 값 읽기"
     //% group="색상 감지 센서"
     export function getBlue(): number {
-        return Math.round(_tcs3472.rgb()[2])
+        return Math.round(getCalibratedRGB()[2]);
     }
 
     /**
@@ -860,7 +860,7 @@ namespace ponyBot {
      * 감지된 색상이 지정된 색상인지 확인
      */
     //% blockId=color_sensor_is_color
-    //% block="감지된 색상이 %color 입니까?"
+    //% block="감지된 색상이 %color"
     //% group="색상 감지 센서"
     export function isColor(color: DetectedColor): boolean {
         const rgb = getCalibratedRGB();
