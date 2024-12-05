@@ -784,29 +784,9 @@ namespace ponyBot {
     }
 
     let _tcs3472: tcs3472 = new tcs3472(0x29)
-    let calibrationMin: number[] = [0, 0, 0];
-    let calibrationMax: number[] = [255, 255, 255];
 
     /**
-     * 컬러 센서를 캘리브레이션
-     */
-    //% blockId=color_sensor_calibrate
-    //% block="색상 감지 센서 캘리브레이션"
-    //% group="색상 감지 센서"
-    export function calibrate(): void {
-        basic.showString("W"); // 흰색 기준
-        basic.pause(3000);
-        calibrationMax = _tcs3472.rgb(); // 흰색 기준으로 최대값 설정
-
-        basic.showString("B"); // 검은색 기준
-        basic.pause(3000);
-        calibrationMin = _tcs3472.rgb(); // 검은색 기준으로 최소값 설정
-
-        basic.showIcon(IconNames.Yes); // 완료 표시
-    }
-
-    /**
-     * Get the light level
+     * 밝기 레벨 센싱
      */
     //% blockId=brickcell_color_tcs34725_get_light
     //% block="밝기(B) 값 읽기"
@@ -816,33 +796,33 @@ namespace ponyBot {
     }
 
     /**
-     * Get the amount of red the colour sensor sees
+     * R 데이터 센싱
      */
     //% blockId=brickcell_color_tcs34725__get_red
     //% block="빨간색(R) 색상 값 읽기"
     //% group="색상 감지 센서"
     export function getRed(): number {
-        return Math.round(getCalibratedRGB()[0]);
+        return Math.round(_tcs3472.rgb()[0]);
     }
 
     /**
-     * Get the amount of green the colour sensor sees
+     * G 데이터 센싱
      */
     //% blockId=brickcell_color_tcs34725_get_green
     //% block="초록색(G) 색상 값 읽기"
     //% group="색상 감지 센서"
     export function getGreen(): number {
-        return Math.round(getCalibratedRGB()[1]);
+        return Math.round(_tcs3472.rgb()[1]);
     }
 
     /**
-     * Get the amount of blue the colour sensor sees
+     * B 데이터 센싱
      */
     //% blockId=brickcell_color_tcs34725_get_blue
     //% block="파란색(B) 색상 값 읽기"
     //% group="색상 감지 센서"
     export function getBlue(): number {
-        return Math.round(getCalibratedRGB()[2]);
+        return Math.round(_tcs3472.rgb()[2]);
     }
 
     /**
@@ -863,7 +843,7 @@ namespace ponyBot {
     //% block="감지된 색상이 %color"
     //% group="색상 감지 센서"
     export function isColor(color: DetectedColor): boolean {
-        const rgb = getCalibratedRGB();
+        const rgb = _tcs3472.rgb();
         const r = rgb[0];
         const g = rgb[1];
         const b = rgb[2];
@@ -889,30 +869,6 @@ namespace ponyBot {
             default:
                 return false;
         }
-    }
-
-    /**
-     * 캘리브레이션된 RGB 값을 반환
-     */
-    export function getCalibratedRGB(): number[] {
-        const rawRGB = _tcs3472.rgb();
-        return normalizeRGB(rawRGB);
-    }
-
-    /**
-     * Normalize RGB values based on calibration
-     * @param rgb Raw RGB values from the sensor
-     * @returns Normalized RGB values
-     */
-    function normalizeRGB(rgb: number[]): number[] {
-        let normalized: number[] = [];
-        for (let i = 0; i < rgb.length; i++) {
-            const value = Math.clamp(0, 255,
-                ((rgb[i] - calibrationMin[i]) / (calibrationMax[i] - calibrationMin[i])) * 255
-            );
-            normalized.push(value);
-        }
-        return normalized;
     }
 }
 
