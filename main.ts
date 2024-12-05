@@ -789,8 +789,8 @@ namespace ponyBot {
     let isCalibrated: boolean = false;
 
     /**
-    * 색상 센서 캘리브레이션
-    */
+     * 색상 센서 캘리브레이션
+     */
     //% blockId=color_sensor_calibrate
     //% block="색상 센서 캘리브레이션 시작"
     //% group="색상 감지 센서"
@@ -800,16 +800,28 @@ namespace ponyBot {
         // 초기 상태: 흰색 데이터 측정
         basic.showString("W");
 
-        // A 버튼: 다음 단계로 진행
+        // A 버튼: 현재 단계의 데이터를 측정
         input.onButtonPressed(Button.A, function () {
             if (calibrationStep === 0) {
-                // 블랙 데이터 측정 단계로 이동
+                // 흰색 데이터 측정
                 calibrationMax = _tcs3472.rgb();
+                basic.showIcon(IconNames.Square); // 흰색 완료 표시
+            } else if (calibrationStep === 1) {
+                // 검은색 데이터 측정
+                calibrationMin = _tcs3472.rgb();
+                basic.showIcon(IconNames.SmallSquare); // 검은색 완료 표시
+            }
+        });
+
+        // B 버튼: 단계 전환
+        input.onButtonPressed(Button.B, function () {
+            if (calibrationStep === 0) {
+                // 블랙 측정 단계로 이동
                 calibrationStep = 1;
                 basic.showString("B");
             } else if (calibrationStep === 1) {
-                // 캘리브레이션 완료 확인
-                calibrationMin = _tcs3472.rgb();
+                // 완료 확인 단계로 이동
+                calibrationStep = 2;
                 if (isCalibrationValid()) {
                     isCalibrated = true;
                     basic.showIcon(IconNames.Yes); // V 표시
