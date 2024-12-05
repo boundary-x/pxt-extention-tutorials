@@ -789,8 +789,8 @@ namespace ponyBot {
     let isCalibrated: boolean = false;
 
     /**
-    * 색상 센서 캘리브레이션
-    */
+     * 색상 센서 캘리브레이션
+     */
     //% blockId=color_sensor_calibrate
     //% block="색상 센서 캘리브레이션 시작"
     //% group="색상 감지 센서"
@@ -800,7 +800,7 @@ namespace ponyBot {
         // 초기 상태: 흰색 데이터 측정
         basic.showString("W");
 
-        // A 버튼: 현재 단계 데이터 측정
+        // A 버튼: 흰색 또는 검은색 데이터 측정
         input.onButtonPressed(Button.A, function () {
             if (calibrationStep === 0) {
                 // 흰색 데이터 측정
@@ -813,7 +813,7 @@ namespace ponyBot {
             }
         });
 
-        // B 버튼: 단계 전환
+        // B 버튼: 단계 전환 및 완료 확인
         input.onButtonPressed(Button.B, function () {
             if (calibrationStep === 0) {
                 // 블랙 측정 단계로 이동
@@ -822,16 +822,28 @@ namespace ponyBot {
             } else if (calibrationStep === 1) {
                 // 완료 확인 단계로 이동
                 calibrationStep = 2;
-                applyCalibrationCorrection(); // 데이터 보정 수행
-                if (isCalibrationValid()) {
+
+                // 유효성 검사 및 결과 표시
+                if (isCalibrationDataValid()) {
+                    applyCalibrationCorrection(); // 보정 적용
                     isCalibrated = true;
                     basic.showIcon(IconNames.Yes); // V 표시
                 } else {
                     isCalibrated = false;
-                    basic.showIcon(IconNames.No); // X 표시 (최소화됨)
+                    basic.showIcon(IconNames.No); // X 표시
                 }
             }
         });
+    }
+
+    /**
+     * 캘리브레이션 데이터가 유효한지 확인
+     * @returns boolean 데이터가 유효하면 true, 그렇지 않으면 false
+     */
+    function isCalibrationDataValid(): boolean {
+        return calibrationMax[0] > calibrationMin[0] &&
+            calibrationMax[1] > calibrationMin[1] &&
+            calibrationMax[2] > calibrationMin[2];
     }
 
     /**
@@ -846,16 +858,6 @@ namespace ponyBot {
                 calibrationMax[i] = Math.min(255, calibrationMax[i] + 10);
             }
         }
-    }
-
-    /**
-     * 캘리브레이션 데이터가 유효한지 확인
-     * @returns boolean 데이터가 유효하면 true, 그렇지 않으면 false
-     */
-    function isCalibrationValid(): boolean {
-        return calibrationMax[0] > calibrationMin[0] &&
-            calibrationMax[1] > calibrationMin[1] &&
-            calibrationMax[2] > calibrationMin[2];
     }
 
     /**
