@@ -820,11 +820,8 @@ namespace ponyBot {
     }
 
     /**
-        * 캘리브레이션된 R, G, B 데이터 읽기
-        */
-    //% blockId=get_calibrated_rgb
-    //% block="캘리브레이션된 RGB 데이터 읽기"
-    //% group="색상 감지 센서"
+      * 캘리브레이션된 R, G, B 값 반환
+      */
     export function getCalibratedRGB(): number[] {
         if (!isCalibrated) {
             basic.showIcon(IconNames.No); // 캘리브레이션이 필요함
@@ -835,7 +832,7 @@ namespace ponyBot {
     }
 
     /**
-     * 정규화된 RGB 값 반환
+     * 정규화된 RGB 값 계산
      * @param rgb Raw RGB values from the sensor
      */
     function normalizeRGB(rgb: number[]): number[] {
@@ -843,13 +840,33 @@ namespace ponyBot {
         for (let i = 0; i < rgb.length; i++) {
             const range = calibrationMax[i] - calibrationMin[i];
             if (range <= 0) {
-                normalized.push(0); // 비정상적인 캘리브레이션 값 처리
+                normalized.push(0);
             } else {
                 const value = ((rgb[i] - calibrationMin[i]) / range) * 255;
                 normalized.push(Math.clamp(0, 255, value));
             }
         }
         return normalized;
+    }
+
+    /**
+    * RGB 데이터 중 하나 선택
+    */
+    export enum RGBColor {
+        //% block="빨간색"
+        Red = 0,
+        //% block="초록색"
+        Green = 1,
+        //% block="파란색"
+        Blue = 2
+    }
+
+    //% blockId=get_rgb_value
+    //% block="%color 값 읽기"
+    //% group="색상 감지 센서"
+    export function getRGBValue(color: RGBColor): number {
+        const calibratedRGB = getCalibratedRGB();
+        return Math.round(calibratedRGB[color]);
     }
 
     /**
