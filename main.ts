@@ -783,147 +783,73 @@ namespace ponyBot {
         }
     }
 
-    let _tcs3472: tcs3472 = new tcs3472(0x29);
-    let calibrationMin: number[] = [0, 0, 0];
-    let calibrationMax: number[] = [255, 255, 255];
-    let isCalibrated: boolean = false;
+    let _tcs3472: tcs3472 = new tcs3472(0x29)
 
     /**
-     * 색상 센서 캘리브레이션
+     * 밝기 레벨 센싱
      */
-    //% blockId=color_sensor_calibrate
-    //% block="색상 센서 캘리브레이션 시작"
+    //% blockId=brickcell_color_tcs34725_get_light
+    //% block="밝기(B) 값 읽기"
     //% group="색상 감지 센서"
-    export function calibrate(): void {
-        let calibrationStep = 0;
-
-        // 초기 상태: 흰색 데이터 측정
-        basic.showString("W");
-
-        // A 버튼: 흰색 또는 검은색 데이터 측정
-        input.onButtonPressed(Button.A, function () {
-            if (calibrationStep === 0) {
-                // 흰색 데이터 측정
-                calibrationMax = _tcs3472.rgb();
-                basic.showIcon(IconNames.Square); // 흰색 완료 표시
-            } else if (calibrationStep === 1) {
-                // 검은색 데이터 측정
-                calibrationMin = _tcs3472.rgb();
-                basic.showIcon(IconNames.SmallSquare); // 검은색 완료 표시
-            }
-        });
-
-        // B 버튼: 단계 전환 및 완료 확인
-        input.onButtonPressed(Button.B, function () {
-            if (calibrationStep === 0) {
-                // 블랙 측정 단계로 이동
-                calibrationStep = 1;
-                basic.showString("B");
-            } else if (calibrationStep === 1) {
-                // 완료 확인 단계로 이동
-                calibrationStep = 2;
-
-                // 유효성 검사 및 결과 표시
-                if (isCalibrationDataValid()) {
-                    applyCalibrationCorrection(); // 보정 적용
-                    isCalibrated = true;
-                    basic.showIcon(IconNames.Yes); // V 표시
-                } else {
-                    isCalibrated = false;
-                    basic.showIcon(IconNames.No); // X 표시
-                }
-            }
-        });
+    export function getLight(): number {
+        return Math.round(_tcs3472.light())
     }
 
     /**
-     * 캘리브레이션 데이터가 유효한지 확인
-     * @returns boolean 데이터가 유효하면 true, 그렇지 않으면 false
+     * R 데이터 센싱
      */
-    function isCalibrationDataValid(): boolean {
-        return calibrationMax[0] > calibrationMin[0] &&
-            calibrationMax[1] > calibrationMin[1] &&
-            calibrationMax[2] > calibrationMin[2];
-    }
-
-    /**
-     * 캘리브레이션 데이터 보정
-     * 데이터 차이가 너무 작을 경우 기본 범위를 설정하여 보정
-     */
-    function applyCalibrationCorrection(): void {
-        for (let i = 0; i < 3; i++) {
-            if (calibrationMax[i] - calibrationMin[i] < 10) {
-                // 흰색과 검은색 차이가 작으면 기본값 보정
-                calibrationMin[i] = Math.max(0, calibrationMin[i] - 10);
-                calibrationMax[i] = Math.min(255, calibrationMax[i] + 10);
-            }
-        }
-    }
-
-    /**
-      * 캘리브레이션된 R, G, B 값 반환
-      */
-    export function getCalibratedRGB(): number[] {
-        if (!isCalibrated) {
-            basic.showIcon(IconNames.No); // 캘리브레이션이 필요함
-            return [0, 0, 0];
-        }
-        const rawRGB = _tcs3472.rgb();
-        return normalizeRGB(rawRGB);
-    }
-
-    /**
-     * 정규화된 RGB 값 계산
-     * @param rgb Raw RGB values from the sensor
-     */
-    function normalizeRGB(rgb: number[]): number[] {
-        let normalized: number[] = [];
-        for (let i = 0; i < rgb.length; i++) {
-            const range = calibrationMax[i] - calibrationMin[i];
-            if (range <= 0) {
-                normalized.push(0);
-            } else {
-                const value = ((rgb[i] - calibrationMin[i]) / range) * 255;
-                normalized.push(Math.clamp(0, 255, value));
-            }
-        }
-        return normalized;
-    }
-
-    /**
-    * RGB 데이터 중 하나 선택
-    */
-    export enum RGBColor {
-        //% block="빨간색"
-        Red = 0,
-        //% block="초록색"
-        Green = 1,
-        //% block="파란색"
-        Blue = 2
-    }
-
-    //% blockId=get_rgb_value
-    //% block="%color 값 읽기"
+    //% blockId=brickcell_color_tcs34725__get_red
+    //% block="빨간색(R) 색상 값 읽기"
     //% group="색상 감지 센서"
-    export function getRGBValue(color: RGBColor): number {
-        const calibratedRGB = getCalibratedRGB();
-        return Math.round(calibratedRGB[color]);
+    export function getRed(): number {
+        return Math.round(_tcs3472.rgb()[0]);
     }
 
     /**
-     * 특정 색상 감지
+     * G 데이터 센싱
      */
-    //% blockId=is_detected_color
-    //% block="감지된 색상이 %color 입니까?"
+    //% blockId=brickcell_color_tcs34725_get_green
+    //% block="초록색(G) 색상 값 읽기"
+    //% group="색상 감지 센서"
+    export function getGreen(): number {
+        return Math.round(_tcs3472.rgb()[1]);
+    }
+
+    /**
+     * B 데이터 센싱
+     */
+    //% blockId=brickcell_color_tcs34725_get_blue
+    //% block="파란색(B) 색상 값 읽기"
+    //% group="색상 감지 센서"
+    export function getBlue(): number {
+        return Math.round(_tcs3472.rgb()[2]);
+    }
+
+    /**
+     * Set the integration time of the colour sensor in ms
+     */
+    //% blockId=brickcell_color_tcs34725_set_integration_time
+    //% block="색상 통합 시간을 %time ms로 설정"
+    //% time.min=0 time.max=612 value.defl=500
+    //% group="색상 감지 센서"
+    export function setColourIntegrationTime(time: number): void {
+        return _tcs3472.setIntegrationTime(time)
+    }
+
+    /**
+     * 감지된 색상이 지정된 색상인지 확인
+     */
+    //% blockId=color_sensor_is_color
+    //% block="감지된 색상이 %color"
     //% group="색상 감지 센서"
     export function isColor(color: DetectedColor): boolean {
-        const rgb = getCalibratedRGB();
+        const rgb = _tcs3472.rgb();
         const r = rgb[0];
         const g = rgb[1];
         const b = rgb[2];
 
         const total = r + g + b;
-        if (total === 0) return false; // 검출 불가 시 false
+        if (total === 0) return false;
 
         const normR = r / total;
         const normG = g / total;
@@ -931,11 +857,11 @@ namespace ponyBot {
 
         switch (color) {
             case DetectedColor.Red:
-                return normR > 0.4 && normG < 0.3 && normB < 0.3;
+                return normR > 0.5 && normG < 0.3 && normB < 0.3;
             case DetectedColor.Green:
-                return normG > 0.4 && normR < 0.3 && normB < 0.3;
+                return normG > 0.5 && normR < 0.3 && normB < 0.3;
             case DetectedColor.Blue:
-                return normB > 0.4 && normR < 0.3 && normG < 0.3;
+                return normB > 0.5 && normR < 0.3 && normG < 0.3;
             case DetectedColor.White:
                 return r > 200 && g > 200 && b > 200;
             case DetectedColor.Black:
@@ -945,8 +871,6 @@ namespace ponyBot {
         }
     }
 }
-
-
 
 namespace smbus {
     export function writeByte(addr: number, register: number, value: number): void {
