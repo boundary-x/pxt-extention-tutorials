@@ -783,73 +783,89 @@ namespace ponyBot {
         }
     }
 
-    let _tcs3472: tcs3472 = new tcs3472(0x29)
+    let _tcs3472: tcs3472 = new tcs3472(0x29);
+    let calibrationMin: number[] = [0, 0, 0];
+    let calibrationMax: number[] = [255, 255, 255];
+    let isCalibrated: boolean = false;
 
     /**
-     * 밝기 레벨 센싱
+     * 컬러 센서 캘리브레이션
      */
-    //% blockId=brickcell_color_tcs34725_get_light
-    //% block="밝기(B) 값 읽기"
+    //% blockId=color_sensor_calibrate
+    //% block="색상 센서 캘리브레이션 시작"
     //% group="색상 감지 센서"
-    export function getLight(): number {
-        return Math.round(_tcs3472.light())
+    export function calibrate(): void {
+        basic.showString("W"); // 흰색 캘리브레이션 준비
+        input.onButtonPressed(Button.A, function () {
+            calibrationMax = _tcs3472.rgb(); // 흰색 데이터 측정
+            basic.showIcon(IconNames.Square); // 흰색 완료 표시
+        });
+
+        basic.showString("B"); // 검은색 캘리브레이션 준비
+        input.onButtonPressed(Button.B, function () {
+            calibrationMin = _tcs3472.rgb(); // 검은색 데이터 측정
+            basic.showIcon(IconNames.SmallSquare); // 검은색 완료 표시
+        });
+
+        input.onButtonPressed(Button.AB, function () {
+            if (calibrationMax[0] > calibrationMin[0] &&
+                calibrationMax[1] > calibrationMin[1] &&
+                calibrationMax[2] > calibrationMin[2]) {
+                isCalibrated = true;
+                basic.showIcon(IconNames.Yes); // 캘리브레이션 완료 표시
+            } else {
+                basic.showIcon(IconNames.No); // 캘리브레이션 오류 표시
+            }
+        });
     }
 
     /**
-     * R 데이터 센싱
-     */
-    //% blockId=brickcell_color_tcs34725__get_red
-    //% block="빨간색(R) 색상 값 읽기"
+        * 캘리브레이션된 R, G, B 데이터 읽기
+        */
+    //% blockId=get_calibrated_rgb
+    //% block="캘리브레이션된 RGB 데이터 읽기"
     //% group="색상 감지 센서"
-    export function getRed(): number {
-        return Math.round(_tcs3472.rgb()[0]);
+    export function getCalibratedRGB(): number[] {
+        if (!isCalibrated) {
+            basic.showIcon(IconNames.No); // 캘리브레이션이 필요함
+            return [0, 0, 0];
+        }
+        const rawRGB = _tcs3472.rgb();
+        return normalizeRGB(rawRGB);
     }
 
     /**
-     * G 데이터 센싱
+     * 정규화된 RGB 값 반환
+     * @param rgb Raw RGB values from the sensor
      */
-    //% blockId=brickcell_color_tcs34725_get_green
-    //% block="초록색(G) 색상 값 읽기"
-    //% group="색상 감지 센서"
-    export function getGreen(): number {
-        return Math.round(_tcs3472.rgb()[1]);
+    function normalizeRGB(rgb: number[]): number[] {
+        let normalized: number[] = [];
+        for (let i = 0; i < rgb.length; i++) {
+            const range = calibrationMax[i] - calibrationMin[i];
+            if (range <= 0) {
+                normalized.push(0); // 비정상적인 캘리브레이션 값 처리
+            } else {
+                const value = ((rgb[i] - calibrationMin[i]) / range) * 255;
+                normalized.push(Math.clamp(0, 255, value));
+            }
+        }
+        return normalized;
     }
 
     /**
-     * B 데이터 센싱
+     * 특정 색상 감지
      */
-    //% blockId=brickcell_color_tcs34725_get_blue
-    //% block="파란색(B) 색상 값 읽기"
-    //% group="색상 감지 센서"
-    export function getBlue(): number {
-        return Math.round(_tcs3472.rgb()[2]);
-    }
-
-    /**
-     * Set the integration time of the colour sensor in ms
-     */
-    //% blockId=brickcell_color_tcs34725_set_integration_time
-    //% block="색상 통합 시간을 %time ms로 설정"
-    //% time.min=0 time.max=612 value.defl=500
-    //% group="색상 감지 센서"
-    export function setColourIntegrationTime(time: number): void {
-        return _tcs3472.setIntegrationTime(time)
-    }
-
-    /**
-     * 감지된 색상이 지정된 색상인지 확인
-     */
-    //% blockId=color_sensor_is_color
-    //% block="감지된 색상이 %color"
+    //% blockId=is_detected_color
+    //% block="감지된 색상이 %color 입니까?"
     //% group="색상 감지 센서"
     export function isColor(color: DetectedColor): boolean {
-        const rgb = _tcs3472.rgb();
+        const rgb = getCalibratedRGB();
         const r = rgb[0];
         const g = rgb[1];
         const b = rgb[2];
 
         const total = r + g + b;
-        if (total === 0) return false;
+        if (total === 0) return false; // 검출 불가 시 false
 
         const normR = r / total;
         const normG = g / total;
@@ -857,11 +873,11 @@ namespace ponyBot {
 
         switch (color) {
             case DetectedColor.Red:
-                return normR > 0.5 && normG < 0.3 && normB < 0.3;
+                return normR > 0.4 && normG < 0.3 && normB < 0.3;
             case DetectedColor.Green:
-                return normG > 0.5 && normR < 0.3 && normB < 0.3;
+                return normG > 0.4 && normR < 0.3 && normB < 0.3;
             case DetectedColor.Blue:
-                return normB > 0.5 && normR < 0.3 && normG < 0.3;
+                return normB > 0.4 && normR < 0.3 && normG < 0.3;
             case DetectedColor.White:
                 return r > 200 && g > 200 && b > 200;
             case DetectedColor.Black:
@@ -871,6 +887,8 @@ namespace ponyBot {
         }
     }
 }
+
+
 
 namespace smbus {
     export function writeByte(addr: number, register: number, value: number): void {
