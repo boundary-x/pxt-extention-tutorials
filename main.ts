@@ -789,34 +789,46 @@ namespace ponyBot {
     let isCalibrated: boolean = false;
 
     /**
-     * 컬러 센서 캘리브레이션
-     */
+    * 색상 센서 캘리브레이션
+    */
     //% blockId=color_sensor_calibrate
     //% block="색상 센서 캘리브레이션 시작"
     //% group="색상 감지 센서"
     export function calibrate(): void {
-        basic.showString("W"); // 흰색 캘리브레이션 준비
+        let calibrationStep = 0;
+
+        // 초기 상태: 흰색 데이터 측정
+        basic.showString("W");
+
+        // A 버튼: 다음 단계로 진행
         input.onButtonPressed(Button.A, function () {
-            calibrationMax = _tcs3472.rgb(); // 흰색 데이터 측정
-            basic.showIcon(IconNames.Square); // 흰색 완료 표시
-        });
-
-        basic.showString("B"); // 검은색 캘리브레이션 준비
-        input.onButtonPressed(Button.B, function () {
-            calibrationMin = _tcs3472.rgb(); // 검은색 데이터 측정
-            basic.showIcon(IconNames.SmallSquare); // 검은색 완료 표시
-        });
-
-        input.onButtonPressed(Button.AB, function () {
-            if (calibrationMax[0] > calibrationMin[0] &&
-                calibrationMax[1] > calibrationMin[1] &&
-                calibrationMax[2] > calibrationMin[2]) {
-                isCalibrated = true;
-                basic.showIcon(IconNames.Yes); // 캘리브레이션 완료 표시
-            } else {
-                basic.showIcon(IconNames.No); // 캘리브레이션 오류 표시
+            if (calibrationStep === 0) {
+                // 블랙 데이터 측정 단계로 이동
+                calibrationMax = _tcs3472.rgb();
+                calibrationStep = 1;
+                basic.showString("B");
+            } else if (calibrationStep === 1) {
+                // 캘리브레이션 완료 확인
+                calibrationMin = _tcs3472.rgb();
+                if (isCalibrationValid()) {
+                    isCalibrated = true;
+                    basic.showIcon(IconNames.Yes); // V 표시
+                } else {
+                    isCalibrated = false;
+                    basic.showIcon(IconNames.No); // X 표시
+                }
             }
         });
+    }
+
+    /**
+     * 캘리브레이션 데이터가 유효한지 확인
+     * @returns boolean 데이터가 유효하면 true, 그렇지 않으면 false
+     */
+    function isCalibrationValid(): boolean {
+        return calibrationMax[0] > calibrationMin[0] &&
+            calibrationMax[1] > calibrationMin[1] &&
+            calibrationMax[2] > calibrationMin[2];
     }
 
     /**
