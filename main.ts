@@ -1569,6 +1569,7 @@ namespace AIponybot {
     //% x.max=127 x.min=0 x.defl=0
     //% y.max=63 y.min=0 y.defl=0
     //% color.max=1 color.min=0 color.defl=1
+    //% blockGap=8 inlineInputMode=inline
     //% group="디스플레이 제어(도형)"
     //% weight=4
     export function pixel(x: number, y: number, color: number = 1) {
@@ -1663,7 +1664,7 @@ namespace AIponybot {
     //% col.max=120 col.min=0 col.defl=0
     //% row.max=7 row.min=0 row.defl=0
     //% color.max=1 color.min=0 color.defl=1
-    //%blockGap=8 inlineInputMode=inline
+    //% blockGap=8 inlineInputMode=inline
     //% group="디스플레이 제어(데이터)"
     //% weight=1
     export function showString(s: string, col: number, row: number, color: number = 1) {
