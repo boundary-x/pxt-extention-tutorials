@@ -1,5 +1,5 @@
-//% weight=10 color=#58ACFA icon="\uf057" block="Pony Bot"
-namespace ponyBot {
+//% weight=10 color=#58ACFA icon="\uf057" block="AI ponybot"
+namespace AIponybot {
     const PCA9685_ADDRESS = 0x40
     const MODE1 = 0x00
     const MODE2 = 0x01
