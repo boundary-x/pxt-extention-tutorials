@@ -749,11 +749,7 @@ namespace AIponybot {
         //% block="초록색"
         Green,
         //% block="파란색"
-        Blue,
-        //% block="흰색"
-        White,
-        //% block="검은색"
-        Black,
+        Blue
     }
 
     class tcs3472 {
@@ -864,24 +860,21 @@ namespace AIponybot {
         const g = rgb[1];
         const b = rgb[2];
 
-        const total = r + g + b;
-        if (total === 0) return false;
-
-        const normR = r / total;
-        const normG = g / total;
-        const normB = b / total;
+        let maxColorValue = r; // 기본적으로 r을 최대값으로 가정합니다.
+        if (g > maxColorValue) {
+            maxColorValue = g; // g가 r보다 크면 g를 최대값으로 설정합니다.
+        }
+        if (b > maxColorValue) {
+            maxColorValue = b; // b가 현재 최대값보다 크면 b를 최대값으로 설정합니다.
+        }
 
         switch (color) {
             case DetectedColor.Red:
-                return normR > 0.5 && normG < 0.3 && normB < 0.3;
+                return r === maxColorValue && r > g && r > b; // 빨간색이 가장 큰 값일 경우
             case DetectedColor.Green:
-                return normG > 0.5 && normR < 0.3 && normB < 0.3;
+                return g === maxColorValue && g > r && g > b; // 초록색이 가장 큰 값일 경우
             case DetectedColor.Blue:
-                return normB > 0.5 && normR < 0.3 && normG < 0.3;
-            case DetectedColor.White:
-                return r > 200 && g > 200 && b > 200;
-            case DetectedColor.Black:
-                return r < 50 && g < 50 && b < 50;
+                return b === maxColorValue && b > r && b > g; // 파란색이 가장 큰 값일 경우
             default:
                 return false;
         }
