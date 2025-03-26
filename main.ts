@@ -497,8 +497,8 @@ namespace AIponybot {
     }
 
     /**
-     * ---------------color sensor-------------------
-     */
+ * ---------------color sensor-------------------
+ */
     export enum DetectedColor {
         //% block="빨간색"
         Red,
@@ -600,9 +600,9 @@ namespace AIponybot {
 
     //% blockId=color_sensor_is_color_advanced
     //% block="감지된 색상이 %color (임계값 %threshold)"
-    //% threshold.min=10 threshold.max=100 threshold.defl=50
+    //% threshold.min=10 threshold.max=100 threshold.defl=40
     //% group="색상 감지 센서"
-    export function isColorAdvanced(color: DetectedColor, threshold: number = 50): boolean {
+    export function isColorAdvanced(color: DetectedColor, threshold: number = 40): boolean {
         const rgb = _tcs3472.rgb();
         const r = rgb[0];
         const g = rgb[1];
@@ -631,8 +631,8 @@ namespace AIponybot {
                     gRatio > 0.4;
             case DetectedColor.Blue:
                 return bRatio > rRatio + thresholdRatio &&
-                    bRatio > gRatio + thresholdRatio &&
-                    bRatio > 0.4;
+                    bRatio > gRatio + thresholdRatio * 0.8 && // G와의 차이 완화
+                    bRatio > 0.35; // 최소 비율 낮춤
             case DetectedColor.Yellow:
                 return rRatio > bRatio + thresholdRatio &&
                     gRatio > bRatio + thresholdRatio &&
@@ -649,7 +649,7 @@ namespace AIponybot {
     }
 
     //% blockId=color_sensor_is_in_range
-    //% block="R(빨간색): %minR ~ %maxR, G(초록색): %minG ~ %maxG, B(파란색): %minB ~ %maxB"
+    //% block="R: %minR ~ %maxR, G: %minG ~ %maxG, B: %minB ~ %maxB"
     //% minR.min=0 minR.max=255 minR.defl=0
     //% maxR.min=0 maxR.max=255 maxR.defl=255
     //% minG.min=0 minG.max=255 minG.defl=0
