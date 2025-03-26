@@ -649,7 +649,7 @@ namespace AIponybot {
     }
 
     //% blockId=color_sensor_is_in_range
-    //% block="R: %minR ~ %maxR, G: %minG ~ %maxG, B: %minB ~ %maxB"
+    //% block="R(빨간색): %minR ~ %maxR, G(초록색): %minG ~ %maxG, B(파란색): %minB ~ %maxB"
     //% minR.min=0 minR.max=255 minR.defl=0
     //% maxR.min=0 maxR.max=255 maxR.defl=255
     //% minG.min=0 minG.max=255 minG.defl=0
