@@ -497,8 +497,8 @@ namespace AIponybot {
     }
 
     /**
- * ---------------color sensor-------------------
- */
+     * ---------------color sensor-------------------
+     */
     export enum DetectedColor {
         //% block="빨간색"
         Red,
@@ -507,9 +507,8 @@ namespace AIponybot {
         //% block="파란색"
         Blue,
         //% block="노란색"
-        Yellow,
-        //% block="하얀색"
-        White
+        Yellow
+        // 'White'는 제거됨
     }
 
     class tcs3472 {
@@ -631,18 +630,13 @@ namespace AIponybot {
                     gRatio > 0.4;
             case DetectedColor.Blue:
                 return bRatio > rRatio + thresholdRatio &&
-                    bRatio > gRatio + thresholdRatio * 0.8 && // G와의 차이 완화
-                    bRatio > 0.35; // 최소 비율 낮춤
+                    bRatio > gRatio + thresholdRatio * 0.8 &&
+                    bRatio > 0.35;
             case DetectedColor.Yellow:
                 return rRatio > bRatio + thresholdRatio &&
                     gRatio > bRatio + thresholdRatio &&
                     Math.abs(rRatio - gRatio) < 0.1 &&
                     rRatio + gRatio > 0.6;
-            case DetectedColor.White:
-                return rRatio > 0.25 && gRatio > 0.25 && bRatio > 0.25 &&
-                    Math.abs(rRatio - gRatio) < 0.1 &&
-                    Math.abs(gRatio - bRatio) < 0.1 &&
-                    clear > 1000;
             default:
                 return false;
         }
