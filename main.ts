@@ -75,9 +75,9 @@ namespace aiPonybot {
 
     export enum Stepper {
         //% block="42"
-        Size42 = 1,
+        Stepper42 = 1,
         //% block="28"
-        Size28 = 2
+        Stepper28 = 2
     }
 
     export enum Servo {
