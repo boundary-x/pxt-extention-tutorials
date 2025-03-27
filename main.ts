@@ -3,7 +3,7 @@ declare interface Math {
 }
 
 //% weight=10 color=#58ACFA icon="\uf057" block="AI ponybot"
-namespace aIPonybot {
+namespace aiPonybot {
     /**
      * ---------------PCA9685-------------------
      */
@@ -352,7 +352,7 @@ namespace aIPonybot {
     }
 
     //% weight=0
-    //% blockId=motor_runNormal block="|포니봇|%direction|방향|ometricspeed|속도로 이동"
+    //% blockId=motor_runNormal block="|포니봇|%direction|방향|%speed|속도로 이동"
     //% speed.min=0 speed.max=255
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
     //% group="모터 제어(기초)"
