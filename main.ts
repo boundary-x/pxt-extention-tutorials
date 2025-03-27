@@ -1,8 +1,6 @@
 declare interface Math {
     floor(x: number): number;
 }
-
-//% weight=10 color=#58ACFA icon="\uf057" block="AI ponybot"
 namespace aiPonybot {
     /**
      * ---------------PCA9685-------------------
@@ -120,9 +118,9 @@ namespace aiPonybot {
     }
 
     function i2cCmd(address: number, value: number) {
-        let buffer = pins.createBuffer(1);
-        buffer[0] = value;
-        pins.i2cWriteBuffer(address, buffer);
+        let buffer2 = pins.createBuffer(1);
+        buffer2[0] = value;
+        pins.i2cWriteBuffer(address, buffer2);
     }
 
     function i2cRead(address: number, register: number) {
@@ -155,13 +153,13 @@ namespace aiPonybot {
     function setPwm(channel: number, on: number, off: number): void {
         if (channel < 0 || channel > 15) return;
 
-        let buffer = pins.createBuffer(5);
-        buffer[0] = LED0_ON_L + 4 * channel;
-        buffer[1] = on & 0xff;
-        buffer[2] = (on >> 8) & 0xff;
-        buffer[3] = off & 0xff;
-        buffer[4] = (off >> 8) & 0xff;
-        pins.i2cWriteBuffer(PCA9685_ADDRESS, buffer);
+        let buffer3 = pins.createBuffer(5);
+        buffer3[0] = LED0_ON_L + 4 * channel;
+        buffer3[1] = on & 0xff;
+        buffer3[2] = (on >> 8) & 0xff;
+        buffer3[3] = off & 0xff;
+        buffer3[4] = (off >> 8) & 0xff;
+        pins.i2cWriteBuffer(PCA9685_ADDRESS, buffer3);
     }
 
     function setStepper28(index: number, direction: boolean): void {
@@ -230,8 +228,8 @@ namespace aiPonybot {
             initPCA9685();
         }
         let microseconds = (degree * 1800 / 180 + 600); // 0.6ms ~ 2.4ms
-        let value = microseconds * 4096 / 20000;
-        setPwm(index + 7, 0, value);
+        let value2 = microseconds * 4096 / 20000;
+        setPwm(index + 7, 0, value2);
     }
 
     //% weight=0
@@ -352,7 +350,7 @@ namespace aiPonybot {
     }
 
     //% weight=0
-    //% blockId=motor_runNormal block="|포니봇|%direction|방향|ometricspeed|속도로 이동"
+    //% blockId=motor_runNormal block="|포니봇|%direction|방향|%speed|속도로 이동"
     //% speed.min=0 speed.max=255
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
     //% group="모터 제어(기초)"
@@ -565,8 +563,8 @@ namespace aiPonybot {
         raw(): number[] {
             this.setup();
             try {
-                let result: Buffer = smbus.readBuffer(this.address, 0xb4, pins.sizeOf(NumberFormat.UInt16LE) * 4);
-                return smbus.unpack("HHHH", result); // [Clear, R, G, B]
+                let result2: Buffer = smbus.readBuffer(this.address, 0xb4, pins.sizeOf(NumberFormat.UInt16LE) * 4);
+                return smbus.unpack("HHHH", result2); // [Clear, R, G, B]
             } catch (e) {
                 return [0, 0, 0, 0]; // I2C 오류 시 기본값 반환
             }
@@ -620,9 +618,9 @@ namespace aiPonybot {
         const red = rgb[0];
         const green = rgb[1];
         const blue = rgb[2];
-        const clear = colorSensor.light();
+        const clear2 = colorSensor.light();
 
-        if (clear < 100) return false;
+        if (clear2 < 100) return false;
 
         const total = red + green + blue;
         if (total === 0) return false;
@@ -667,14 +665,14 @@ namespace aiPonybot {
     //% group="색상 감지 센서"
     //% inlineInputMode=inline
     export function isColorInRange(minR: number, maxR: number, minG: number, maxG: number, minB: number, maxB: number): boolean {
-        const rgb = colorSensor.rgb();
-        const red = rgb[0];
-        const green = rgb[1];
-        const blue = rgb[2];
+        const rgb2 = colorSensor.rgb();
+        const red2 = rgb2[0];
+        const green2 = rgb2[1];
+        const blue2 = rgb2[2];
 
-        return red > minR && red < maxR &&
-            green > minG && green < maxG &&
-            blue > minB && blue < maxB;
+        return red2 > minR && red2 < maxR &&
+            green2 > minG && green2 < maxG &&
+            blue2 > minB && blue2 < maxB;
     }
 
     /**
@@ -695,8 +693,8 @@ namespace aiPonybot {
 
     let i2cAddress = 60;
     let screen = pins.createBuffer(1025);
-    let buffer2 = pins.createBuffer(2);
-    let buffer3 = pins.createBuffer(3);
+    let buffer22 = pins.createBuffer(2);
+    let buffer32 = pins.createBuffer(3);
     let buffer4 = pins.createBuffer(4);
     let buffer7 = pins.createBuffer(7);
     let buffer13 = pins.createBuffer(13);
@@ -715,10 +713,10 @@ namespace aiPonybot {
     }
 
     function cmd2(data1: number, data2: number) {
-        buffer3[0] = 0;
-        buffer3[1] = data1;
-        buffer3[2] = data2;
-        pins.i2cWriteBuffer(i2cAddress, buffer3);
+        buffer32[0] = 0;
+        buffer32[1] = data1;
+        buffer32[2] = data2;
+        pins.i2cWriteBuffer(i2cAddress, buffer32);
     }
 
     function cmd3(data1: number, data2: number, data3: number) {
@@ -789,15 +787,15 @@ namespace aiPonybot {
     export function pixel(x: number, y: number, color: number = 1) {
         let page = y >> 3;
         let shiftPage = y % 8;
-        let index = x + page * 128 + 1;
-        let byte = (color) ? (screen[index] | (1 << shiftPage)) : clearBit(screen[index], shiftPage);
-        screen[index] = byte;
+        let index2 = x + page * 128 + 1;
+        let byte = (color) ? (screen[index2] | (1 << shiftPage)) : clearBit(screen[index2], shiftPage);
+        screen[index2] = byte;
     }
 
     function char(character: string, column: number, row: number, color: number = 1) {
         let position = (Math.min(127, Math.max(character.charCodeAt(0), 32)) - 32) * 5;
         let margin = 0;
-        let index = column + row * 128 + 1;
+        let index3 = column + row * 128 + 1;
 
         if (doubleSize) {
             for (let i = 0; i < 5; i++) {
@@ -813,33 +811,33 @@ namespace aiPonybot {
                 }
                 margin += 2;
             }
-            let line = 0;
-            for (let j = 0; j < 8; j++) {
+            let line2 = 0;
+            for (let k = 0; k < 8; k++) {
                 if (color == 0) {
-                    pixel(column + 10, row * 8 + line);
-                    pixel(column + 10, row * 8 + line + 1);
-                    pixel(column + 11, row * 8 + line);
-                    pixel(column + 11, row * 8 + line + 1);
+                    pixel(column + 10, row * 8 + line2);
+                    pixel(column + 10, row * 8 + line2 + 1);
+                    pixel(column + 11, row * 8 + line2);
+                    pixel(column + 11, row * 8 + line2 + 1);
                 }
-                line += 2;
+                line2 += 2;
             }
         } else {
-            let j = 0;
-            for (let i = 0; i < 5; i++) {
-                screen[index + i] = (color > 0) ? FONT_5X7[position + i] : FONT_5X7[position + i] ^ 0xFF;
+            let l = 0;
+            for (let m = 0; m < 5; m++) {
+                screen[index3 + m] = (color > 0) ? FONT_5X7[position + m] : FONT_5X7[position + m] ^ 0xFF;
                 if (zoomEnabled) {
-                    buffer13[j + 1] = screen[index + i];
-                    buffer13[j + 2] = screen[index + i];
+                    buffer13[l + 1] = screen[index3 + m];
+                    buffer13[l + 2] = screen[index3 + m];
                 } else {
-                    buffer7[i + 1] = screen[index + i];
+                    buffer7[m + 1] = screen[index3 + m];
                 }
-                j += 2;
+                l += 2;
             }
-            screen[index + 5] = (color > 0) ? 0 : 0xFF;
+            screen[index3 + 5] = (color > 0) ? 0 : 0xFF;
             if (zoomEnabled) {
-                buffer13[12] = screen[index + 5];
+                buffer13[12] = screen[index3 + 5];
             } else {
-                buffer7[6] = screen[index + 5];
+                buffer7[6] = screen[index3 + 5];
             }
             setPosition(column, row);
             if (zoomEnabled) {
@@ -860,8 +858,8 @@ namespace aiPonybot {
     //% weight=1
     export function showString(text: string, column: number, row: number, color: number = 1) {
         let steps = doubleSize ? 12 : 6;
-        for (let index = 0; index < text.length; index++) {
-            char(text.charAt(index), column, row, color);
+        for (let index4 = 0; index4 < text.length; index4++) {
+            char(text.charAt(index4), column, row, color);
             column += steps;
         }
         if (doubleSize) draw(1);
@@ -897,10 +895,10 @@ namespace aiPonybot {
     //% group="디스플레이 제어(데이터)"
     //% weight=2
     export function printString(text: string, newline: boolean = true) {
-        let steps = doubleSize ? 12 : 6;
-        for (let index = 0; index < text.length; index++) {
-            char(text.charAt(index), cursorX, cursorY, 1);
-            cursorX += steps;
+        let steps2 = doubleSize ? 12 : 6;
+        for (let index5 = 0; index5 < text.length; index5++) {
+            char(text.charAt(index5), cursorX, cursorY, 1);
+            cursorX += steps2;
             if (cursorX > 120) scroll();
         }
         if (newline) scroll();
@@ -929,9 +927,9 @@ namespace aiPonybot {
         let savedDraw = drawEnabled;
         if ((y < MIN_Y) || (y > MAX_Y)) return;
         drawEnabled = 0;
-        for (let i = x; i < (x + length); i++)
-            if ((i >= MIN_X) && (i <= MAX_X))
-                pixel(i, y, color);
+        for (let n = x; n < (x + length); n++)
+            if ((n >= MIN_X) && (n <= MAX_X))
+                pixel(n, y, color);
         drawEnabled = savedDraw;
         draw(drawEnabled);
     }
@@ -945,13 +943,13 @@ namespace aiPonybot {
     //% group="디스플레이 제어(도형)"
     //% weight=1
     export function verticalLine(x: number, y: number, length: number, color: number = 1) {
-        let savedDraw = drawEnabled;
+        let savedDraw2 = drawEnabled;
         drawEnabled = 0;
         if ((x < MIN_X) || (x > MAX_X)) return;
-        for (let i = y; i < (y + length); i++)
-            if ((i >= MIN_Y) && (i <= MAX_Y))
-                pixel(x, i, color);
-        drawEnabled = savedDraw;
+        for (let o = y; o < (y + length); o++)
+            if ((o >= MIN_Y) && (o <= MAX_Y))
+                pixel(x, o, color);
+        drawEnabled = savedDraw2;
         draw(drawEnabled);
     }
 
@@ -997,7 +995,6 @@ namespace aiPonybot {
 
     init();
 }
-
 namespace smbus {
     export function writeByte(address: number, register: number, value: number): void {
         let temp = pins.createBuffer(2);
@@ -1006,29 +1003,29 @@ namespace smbus {
         pins.i2cWriteBuffer(address, temp, false);
     }
     export function writeBuffer(address: number, register: number, value: Buffer): void {
-        let temp = pins.createBuffer(value.length + 1);
-        temp[0] = register;
-        for (let index = 0; index < value.length; index++) {
-            temp[index + 1] = value[index];
+        let temp2 = pins.createBuffer(value.length + 1);
+        temp2[0] = register;
+        for (let index6 = 0; index6 < value.length; index6++) {
+            temp2[index6 + 1] = value[index6];
         }
-        pins.i2cWriteBuffer(address, temp, false);
+        pins.i2cWriteBuffer(address, temp2, false);
     }
     export function readBuffer(address: number, register: number, length: number): Buffer {
-        let temp = pins.createBuffer(1);
-        temp[0] = register;
-        pins.i2cWriteBuffer(address, temp, false);
+        let temp3 = pins.createBuffer(1);
+        temp3[0] = register;
+        pins.i2cWriteBuffer(address, temp3, false);
         return pins.i2cReadBuffer(address, length, false);
     }
     export function readNumber(address: number, register: number, format: NumberFormat = NumberFormat.UInt8LE): number {
-        let temp = pins.createBuffer(1);
-        temp[0] = register;
-        pins.i2cWriteBuffer(address, temp, false);
+        let temp4 = pins.createBuffer(1);
+        temp4[0] = register;
+        pins.i2cWriteBuffer(address, temp4, false);
         return pins.i2cReadNumber(address, format, false);
     }
     export function unpack(format: string, buffer: Buffer): number[] {
         let littleEndian: boolean = true;
         let offset: number = 0;
-        let result: number[] = [];
+        let result3: number[] = [];
         let numberFormat: NumberFormat = 0;
         for (let charIndex = 0; charIndex < format.length; charIndex++) {
             switch (format.charAt(charIndex)) {
@@ -1048,9 +1045,9 @@ namespace smbus {
                 case 'h':
                     numberFormat = littleEndian ? NumberFormat.Int16LE : NumberFormat.Int16BE; break;
             }
-            result.push(buffer.getNumber(numberFormat, offset));
+            result3.push(buffer.getNumber(numberFormat, offset));
             offset += pins.sizeOf(numberFormat);
         }
-        return result;
+        return result3;
     }
 }
