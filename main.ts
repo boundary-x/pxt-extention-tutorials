@@ -254,11 +254,11 @@ namespace aiPonybot {
         let positivePin = (4 - index) * 2;
         let negativePin = (4 - index) * 2 + 1;
         if (speed >= 0) {
-            setPwm(positivePin, 0, speed);
-            setPwm(negativePin, 0, 0);
-        } else {
             setPwm(positivePin, 0, 0);
-            setPwm(negativePin, 0, -speed);
+            setPwm(negativePin, 0, speed);
+        } else {
+            setPwm(positivePin, 0, -speed);
+            setPwm(negativePin, 0, -0);
         }
     }
 
