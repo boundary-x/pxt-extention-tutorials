@@ -678,9 +678,10 @@ namespace aiPonybot {
     }
 
     /**
-     * ---------------oled display(od01)-------------------
-     */
+ * ---------------oled display(od01)-------------------
+ */
     const FONT_5X7 = hex`000000000000005F00000007000700147F147F14242A072A12231308646237495522500005030000001C2241000041221C00082A1C2A0808083E080800503000000808080808006060000020100804023E5149453E00427F400042615149462141454B311814127F1027454545393C4A49493001710905033649494936064949291E003636000000563600000008142241141414141441221408000201510906324979413E7E1111117E7F494949363E414141227F4141221C7F494949417F090901013E414151327F0808087F00417F41002040413F017F081422417F404040407F0204027F7F0408107F3E4141413E7F090909063E4151215E7F09192946464949493101017F01013F4040403F1F2040201F7F2018207F63140814630304780403615149454300007F4141020408102041417F000004020102044040404040000102040020545454787F484444383844444420384444487F3854545418087E090102081454543C7F0804047800447D40002040443D00007F10284400417F40007C041804787C0804047838444444387C14141408081414187C7C080404084854545420043F4440203C4040207C1C2040201C3C4030403C44281028440C5050503C4464544C44000836410000007F000000413608000201020402`;
+
     export enum Display {
         //% block="ON"
         On = 1,
@@ -709,19 +710,19 @@ namespace aiPonybot {
     let zoomEnabled = 0;
     let doubleSize = 0;
 
-    function cmd1(data: number) {
+    function sendCommand1(data: number) {
         let number = data % 256;
         pins.i2cWriteNumber(i2cAddress, number, NumberFormat.UInt16BE);
     }
 
-    function cmd2(data1: number, data2: number) {
+    function sendCommand2(data1: number, data2: number) {
         buffer3[0] = 0;
         buffer3[1] = data1;
         buffer3[2] = data2;
         pins.i2cWriteBuffer(i2cAddress, buffer3);
     }
 
-    function cmd3(data1: number, data2: number, data3: number) {
+    function sendCommand3(data1: number, data2: number, data3: number) {
         buffer4[0] = 0;
         buffer4[1] = data1;
         buffer4[2] = data2;
@@ -730,9 +731,9 @@ namespace aiPonybot {
     }
 
     function setPosition(column: number = 0, page: number = 0) {
-        cmd1(0xb0 | page);
-        cmd1(0x00 | (column % 16));
-        cmd1(0x10 | (column >> 4));
+        sendCommand1(0xb0 | page);
+        sendCommand1(0x00 | (column % 16));
+        sendCommand1(0x10 | (column >> 4));
     }
 
     function clearBit(data: number, bit: number): number {
@@ -753,8 +754,8 @@ namespace aiPonybot {
     //% on.shadow="toggleOnOff"
     //% weight=2
     export function invert(on: boolean = true) {
-        let command = (on) ? 0xA7 : 0xA6;
-        cmd1(command);
+        let number = (on) ? 0xA7 : 0xA6;
+        sendCommand1(number);
     }
 
     //% block="디스플레이 지우기"
@@ -775,8 +776,8 @@ namespace aiPonybot {
     //% on.shadow="toggleOnOff"
     //% weight=1
     export function display(on: boolean) {
-        if (on) cmd1(0xAF);
-        else cmd1(0xAE);
+        if (on) sendCommand1(0xAF);
+        else sendCommand1(0xAE);
     }
 
     //% block="픽셀 출력 - 위치: x %x y %y, 색상: %color"
@@ -794,7 +795,7 @@ namespace aiPonybot {
         screen[index] = byte;
     }
 
-    function char(character: string, column: number, row: number, color: number = 1) {
+    function drawChar(character: string, column: number, row: number, color: number = 1) {
         let position = (Math.min(127, Math.max(character.charCodeAt(0), 32)) - 32) * 5;
         let margin = 0;
         let index = column + row * 128 + 1;
@@ -850,8 +851,8 @@ namespace aiPonybot {
         }
     }
 
-    //% block="문장 출력 - 내용: %s, 위치: %column열 %row행, 색상: %color"
-    //% s.defl='AI ponybot'
+    //% block="문장 출력 - 내용: %text, 위치: %column열 %row행, 색상: %color"
+    //% text.defl='AI ponybot'
     //% column.max=120 column.min=0 column.defl=0
     //% row.max=7 row.min=0 row.defl=0
     //% color.max=1 color.min=0 color.defl=1
@@ -860,15 +861,15 @@ namespace aiPonybot {
     //% weight=1
     export function showString(text: string, column: number, row: number, color: number = 1) {
         let steps = doubleSize ? 12 : 6;
-        for (let index = 0; index < text.length; index++) {
-            char(text.charAt(index), column, row, color);
+        for (let n = 0; n < text.length; n++) {
+            drawChar(text.charAt(n), column, row, color);
             column += steps;
         }
         if (doubleSize) draw(1);
     }
 
-    //% block="숫자 출력 - 내용: %num, 위치: %column열 %row행, 색상: %color"
-    //% num.defl=777
+    //% block="숫자 출력 - 내용: %number, 위치: %column열 %row행, 색상: %color"
+    //% number.defl=777
     //% column.max=120 column.min=0 column.defl=0
     //% row.max=7 row.min=0 row.defl=0
     //% color.max=1 color.min=0 color.defl=1
@@ -890,16 +891,16 @@ namespace aiPonybot {
         }
     }
 
-    //% block="문장 출력 - 내용: %s, 줄바꿈: %newline"
-    //% s.defl="AI ponybot"
+    //% block="문장 출력 - 내용: %text, 줄바꿈: %newline"
+    //% text.defl="AI ponybot"
     //% newline.defl=true
     //% blockGap=8 inlineInputMode=inline
     //% group="디스플레이 제어(데이터)"
     //% weight=2
     export function printString(text: string, newline: boolean = true) {
         let steps = doubleSize ? 12 : 6;
-        for (let index = 0; index < text.length; index++) {
-            char(text.charAt(index), cursorX, cursorY, 1);
+        for (let n = 0; n < text.length; n++) {
+            drawChar(text.charAt(n), cursorX, cursorY, 1);
             cursorX += steps;
             if (cursorX > 120) scroll();
         }
@@ -907,8 +908,8 @@ namespace aiPonybot {
         if (doubleSize) draw(1);
     }
 
-    //% block="숫자 출력 - 내용: %num, 줄바꿈: %newline"
-    //% num.defl="777"
+    //% block="숫자 출력 - 내용: %number, 줄바꿈: %newline"
+    //% number.defl="777"
     //% newline.defl=true
     //% weight=86 blockGap=8 inlineInputMode=inline
     //% group="디스플레이 제어(데이터)"
@@ -972,30 +973,30 @@ namespace aiPonybot {
         draw(1);
     }
 
-    function init() {
-        cmd1(0xAE);       // SSD1306_DISPLAYOFF
-        cmd1(0xA4);       // SSD1306_DISPLAYALLON_RESUME
-        cmd2(0xD5, 0xF5); // SSD1306_SETDISPLAYCLOCKDIV
-        cmd2(0xA8, 0x3F); // SSD1306_SETMULTIPLEX
-        cmd2(0xD3, 0x00); // SSD1306_SETDISPLAYOFFSET
-        cmd1(0 | 0x0);    // line #SSD1306_SETSTARTLINE
-        cmd2(0x8D, 0x14); // SSD1306_CHARGEPUMP
-        cmd2(0x20, 0x00); // SSD1306_MEMORYMODE
-        cmd3(0x21, 0, 127); // SSD1306_COLUMNADDR
-        cmd3(0x22, 0, 63);  // SSD1306_PAGEADDR
-        cmd1(0xa0 | 0x1); // SSD1306_SEGREMAP
-        cmd1(0xc8);       // SSD1306_COMSCANDEC
-        cmd2(0xDA, 0x12); // SSD1306_SETCOMPINS
-        cmd2(0x81, 0xCF); // SSD1306_SETCONTRAST
-        cmd2(0xd9, 0xF1); // SSD1306_SETPRECHARGE
-        cmd2(0xDB, 0x40); // SSD1306_SETVCOMDETECT
-        cmd1(0xA6);       // SSD1306_NORMALDISPLAY
-        cmd2(0xD6, 0);    // zoom off
-        cmd1(0xAF);       // SSD1306_DISPLAYON
+    function initialize() {
+        sendCommand1(0xAE);       // SSD1306_DISPLAYOFF
+        sendCommand1(0xA4);       // SSD1306_DISPLAYALLON_RESUME
+        sendCommand2(0xD5, 0xF0); // SSD1306_SETDISPLAYCLOCKDIV
+        sendCommand2(0xA8, 0x3F); // SSD1306_SETMULTIPLEX
+        sendCommand2(0xD3, 0x00); // SSD1306_SETDISPLAYOFFSET
+        sendCommand1(0 | 0x0);    // line #SSD1306_SETSTARTLINE
+        sendCommand2(0x8D, 0x14); // SSD1306_CHARGEPUMP
+        sendCommand2(0x20, 0x00); // SSD1306_MEMORYMODE
+        sendCommand3(0x21, 0, 127); // SSD1306_COLUMNADDR
+        sendCommand3(0x22, 0, 63);  // SSD1306_PAGEADDR
+        sendCommand1(0xa0 | 0x1); // SSD1306_SEGREMAP
+        sendCommand1(0xc8);       // SSD1306_COMSCANDEC
+        sendCommand2(0xDA, 0x12); // SSD1306_SETCOMPINS
+        sendCommand2(0x81, 0xCF); // SSD1306_SETCONTRAST
+        sendCommand2(0xd9, 0xF1); // SSD1306_SETPRECHARGE
+        sendCommand2(0xDB, 0x40); // SSD1306_SETVCOMDETECT
+        sendCommand1(0xA6);       // SSD1306_NORMALDISPLAY
+        sendCommand2(0xD6, 0);    // zoom off
+        sendCommand1(0xAF);       // SSD1306_DISPLAYON
         clear();
     }
 
-    init();
+    initialize();
 }
 
 namespace smbus {
