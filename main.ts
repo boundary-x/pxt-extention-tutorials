@@ -1,7 +1,3 @@
-declare interface Math {
-    floor(x: number): number;
-}
-
 //% weight=10 color=#58ACFA icon="\uf057" block="AI ponybot"
 namespace aiPonybot {
     /**
@@ -81,20 +77,32 @@ namespace aiPonybot {
     }
 
     export enum Servo {
+        //% block="servo 1"
         Servo1 = 0x01,
+        //% block="servo 2"
         Servo2 = 0x02,
+        //% block="servo 3"
         Servo3 = 0x03,
+        //% block="servo 4"
         Servo4 = 0x04,
+        //% block="servo 5"
         Servo5 = 0x05,
+        //% block="servo 6"
         Servo6 = 0x06,
+        //% block="servo 7"
         Servo7 = 0x07,
+        //% block="servo 8"
         Servo8 = 0x08
     }
 
     export enum Motor {
+        //% block="motor 1"
         Motor1 = 0x1,
+        //% block="motor 2"
         Motor2 = 0x2,
+        //% block="motor 3"
         Motor3 = 0x3,
+        //% block="motor 4"
         Motor4 = 0x4
     }
 
@@ -220,7 +228,7 @@ namespace aiPonybot {
         }
     }
 
-    //% blockId=motor_servo block="|%index|서보모터|%degree|각도로 이동"
+    //% blockId=aiponybot_motor_servo block="|%index|서보모터|%degree|각도로 이동"
     //% weight=0
     //% degree.min=0 degree.max=180
     //% index.fieldEditor="gridpicker" index.fieldOptions.columns=4
@@ -235,7 +243,7 @@ namespace aiPonybot {
     }
 
     //% weight=0
-    //% blockId=motor_runMotor block="|%index|모터|%direction|방향|%speed|속도로 회전"
+    //% blockId=aiponybot_motor_runMotor block="|%index|모터|%direction|방향|%speed|속도로 회전"
     //% speed.min=0 speed.max=255
     //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
@@ -263,7 +271,7 @@ namespace aiPonybot {
     }
 
     //% weight=0
-    //% blockId=motor_runMecanum block="|메카넘|%direction|방향|%speed|속도로 이동"
+    //% blockId=aiponybot_motor_runMecanum block="|메카넘|%direction|방향|%speed|속도로 이동"
     //% speed.min=0 speed.max=255
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=3
     //% group="모터 제어(기초)"
@@ -334,7 +342,7 @@ namespace aiPonybot {
     }
 
     //% weight=0
-    //% blockId=motor_stopMotor block="|%index|모터 정지"
+    //% blockId=aiponybot_motor_stopMotor block="|%index|모터 정지"
     //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2 
     //% group="모터 제어(심화)"
     export function stopMotor(index: Motor) {
@@ -343,7 +351,7 @@ namespace aiPonybot {
     }
 
     //% weight=20
-    //% blockId=motor_stopAllMotors block="|모든 모터 정지"
+    //% blockId=aiponybot_motor_stopAllMotors block="|모든 모터 정지"
     //% group="모터 제어(기초)"
     export function stopAllMotors(): void {
         for (let idx = 1; idx <= 4; idx++) {
@@ -352,7 +360,7 @@ namespace aiPonybot {
     }
 
     //% weight=0
-    //% blockId=motor_runNormal block="|포니봇|%direction|방향|%speed|속도로 이동"
+    //% blockId=aiponybot_motor_runNormal block="|포니봇|%direction|방향|%speed|속도로 이동"
     //% speed.min=0 speed.max=255
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
     //% group="모터 제어(기초)"
@@ -422,7 +430,7 @@ namespace aiPonybot {
 
     //% blockId="checkTwoLineState"
     //% block="두 라인 센서의 값이 %state"
-    //% state.shadow="dropdown"
+    //% state.fieldEditor="gridpicker" state.fieldOptions.columns=2
     //% group="라인 감지 센서"
     //% weight=0
     export function checkTwoLineState(state: TwoLineState): boolean {
@@ -445,8 +453,8 @@ namespace aiPonybot {
 
     //% blockId="checkSingleLineSensor"
     //% block="%channel 라인 센서의 값이 %state"
-    //% channel.shadow="dropdown"
-    //% state.shadow="dropdown"
+    //% channel.fieldEditor="gridpicker" channel.fieldOptions.columns=2
+    //% state.fieldEditor="gridpicker" state.fieldOptions.columns=2
     //% group="라인 감지 센서"
     //% weight=0
     export function checkSingleLineSensor(channel: LineSensorChannel, state: LineState): boolean {
@@ -458,7 +466,7 @@ namespace aiPonybot {
 
     //% blockId="readLineSensor"
     //% block="%channel 라인 센서 값 읽기"
-    //% channel.shadow="dropdown"
+    //% channel.fieldEditor="gridpicker" channel.fieldOptions.columns=2
     //% group="라인 감지 센서"
     //% weight=0
     export function readLineSensor(channel: LineSensorChannel): number {
@@ -479,9 +487,9 @@ namespace aiPonybot {
         Inches
     }
 
-    //% blockId=sonar_ping 
+    //% blockId=aiponybot_sonar_ping
     //% block="%unit 단위로 측정한 거리"
-    //% unit.shadow="dropdown"
+    //% unit.fieldEditor="gridpicker" unit.fieldOptions.columns=2
     //% group="거리 감지 센서"
     //% weight=0
     export function ping(unit: PingUnit, maxCmDistance = 500): number {
@@ -538,14 +546,14 @@ namespace aiPonybot {
         setup(): void {
             if (this.isSetup) return;
             this.isSetup = true;
-            smbus.writeByte(this.address, 0x80, 0x03); // Enable register: PON | AEN
-            smbus.writeByte(this.address, 0x81, 0x2b); // Integration time: 103.2ms
+            aiPonybot.smbus.writeByte(this.address, 0x80, 0x03); // Enable register: PON | AEN
+            aiPonybot.smbus.writeByte(this.address, 0x81, 0x2b); // Integration time: 103.2ms
         }
 
         setIntegrationTime(time: number): void {
             this.setup();
             time = Math.clamp(0, 255, time * 10 / 24);
-            smbus.writeByte(this.address, 0x81, 255 - time);
+            aiPonybot.smbus.writeByte(this.address, 0x81, 255 - time);
         }
 
         light(): number {
@@ -565,8 +573,8 @@ namespace aiPonybot {
         raw(): number[] {
             this.setup();
             try {
-                let result: Buffer = smbus.readBuffer(this.address, 0xb4, pins.sizeOf(NumberFormat.UInt16LE) * 4);
-                return smbus.unpack("HHHH", result); // [Clear, R, G, B]
+                let result: Buffer = aiPonybot.smbus.readBuffer(this.address, 0xb4, pins.sizeOf(NumberFormat.UInt16LE) * 4);
+                return aiPonybot.smbus.unpack("HHHH", result); // [Clear, R, G, B]
             } catch (e) {
                 return [0, 0, 0, 0]; // I2C 오류 시 기본값 반환
             }
@@ -575,35 +583,35 @@ namespace aiPonybot {
 
     let colorSensor: Tcs3472 = new Tcs3472(0x29); // 기본 I2C 주소 0x29
 
-    //% blockId=brickcell_color_tcs34725_get_light
+    //% blockId=aiponybot_color_tcs34725_get_light
     //% block="밝기(B) 값 읽기"
     //% group="색상 감지 센서"
     export function getLight(): number {
         return Math.round(colorSensor.light());
     }
 
-    //% blockId=brickcell_color_tcs34725_get_red
+    //% blockId=aiponybot_color_tcs34725_get_red
     //% block="빨간색(R) 색상 값 읽기"
-    //% group="색한다상 감지 센서"
+    //% group="색상 감지 센서"
     export function getRed(): number {
         return Math.round(colorSensor.rgb()[0]);
     }
 
-    //% blockId=brickcell_color_tcs34725_get_green
+    //% blockId=aiponybot_color_tcs34725_get_green
     //% block="초록색(G) 색상 값 읽기"
     //% group="색상 감지 센서"
     export function getGreen(): number {
         return Math.round(colorSensor.rgb()[1]);
     }
 
-    //% blockId=brickcell_color_tcs34725_get_blue
+    //% blockId=aiponybot_color_tcs34725_get_blue
     //% block="파란색(B) 색상 값 읽기"
     //% group="색상 감지 센서"
     export function getBlue(): number {
         return Math.round(colorSensor.rgb()[2]);
     }
 
-    //% blockId=brickcell_color_tcs34725_set_integration_time
+    //% blockId=aiponybot_color_tcs34725_set_integration_time
     //% block="색상 통합 시간을 %time ms로 설정"
     //% time.min=0 time.max=612 value.defl=500
     //% group="색상 감지 센서"
@@ -611,7 +619,7 @@ namespace aiPonybot {
         return colorSensor.setIntegrationTime(time);
     }
 
-    //% blockId=color_sensor_is_color_advanced
+    //% blockId=aiponybot_color_sensor_is_color_advanced
     //% block="감지된 색상이 %color (임계값 %threshold)"
     //% threshold.min=10 threshold.max=100 threshold.defl=40
     //% group="색상 감지 센서"
@@ -656,7 +664,7 @@ namespace aiPonybot {
         }
     }
 
-    //% blockId=color_sensor_is_in_range
+    //% blockId=aiponybot_color_sensor_is_in_range
     //% block="R: %minR ~ %maxR, G: %minG ~ %maxG, B: %minB ~ %maxB"
     //% minR.min=0 minR.max=255 minR.defl=0
     //% maxR.min=0 maxR.max=255 maxR.defl=255
@@ -678,7 +686,7 @@ namespace aiPonybot {
     }
 
     /**
- * ---------------oled display(od01)-------------------
+ * ---------------oled display-------------------
  */
     const FONT_5X7 = hex`000000000000005F00000007000700147F147F14242A072A12231308646237495522500005030000001C2241000041221C00082A1C2A0808083E080800503000000808080808006060000020100804023E5149453E00427F400042615149462141454B311814127F1027454545393C4A49493001710905033649494936064949291E003636000000563600000008142241141414141441221408000201510906324979413E7E1111117E7F494949363E414141227F4141221C7F494949417F090901013E414151327F0808087F00417F41002040413F017F081422417F404040407F0204027F7F0408107F3E4141413E7F090909063E4151215E7F09192946464949493101017F01013F4040403F1F2040201F7F2018207F63140814630304780403615149454300007F4141020408102041417F000004020102044040404040000102040020545454787F484444383844444420384444487F3854545418087E090102081454543C7F0804047800447D40002040443D00007F10284400417F40007C041804787C0804047838444444387C14141408081414187C7C080404084854545420043F4440203C4040207C1C2040201C3C4030403C44281028440C5050503C4464544C44000836410000007F000000413608000201020402`;
 
@@ -996,62 +1004,63 @@ namespace aiPonybot {
         clear();
     }
 
+    export namespace smbus {
+        export function writeByte(address: number, register: number, value: number): void {
+            let temp = pins.createBuffer(2);
+            temp[0] = register;
+            temp[1] = value;
+            pins.i2cWriteBuffer(address, temp, false);
+        }
+        export function writeBuffer(address: number, register: number, value: Buffer): void {
+            let temp = pins.createBuffer(value.length + 1);
+            temp[0] = register;
+            for (let index = 0; index < value.length; index++) {
+                temp[index + 1] = value[index];
+            }
+            pins.i2cWriteBuffer(address, temp, false);
+        }
+        export function readBuffer(address: number, register: number, length: number): Buffer {
+            let temp = pins.createBuffer(1);
+            temp[0] = register;
+            pins.i2cWriteBuffer(address, temp, false);
+            return pins.i2cReadBuffer(address, length, false);
+        }
+        export function readNumber(address: number, register: number, format: NumberFormat = NumberFormat.UInt8LE): number {
+            let temp = pins.createBuffer(1);
+            temp[0] = register;
+            pins.i2cWriteBuffer(address, temp, false);
+            return pins.i2cReadNumber(address, format, false);
+        }
+        export function unpack(format: string, buffer: Buffer): number[] {
+            let littleEndian: boolean = true;
+            let offset: number = 0;
+            let result: number[] = [];
+            let numberFormat: NumberFormat = 0;
+            for (let charIndex = 0; charIndex < format.length; charIndex++) {
+                switch (format.charAt(charIndex)) {
+                    case '<':
+                        littleEndian = true;
+                        continue;
+                    case '>':
+                        littleEndian = false;
+                        continue;
+                    case 'c':
+                    case 'B':
+                        numberFormat = littleEndian ? NumberFormat.UInt8LE : NumberFormat.UInt8BE; break;
+                    case 'b':
+                        numberFormat = littleEndian ? NumberFormat.Int8LE : NumberFormat.Int8BE; break;
+                    case 'H':
+                        numberFormat = littleEndian ? NumberFormat.UInt16LE : NumberFormat.UInt16BE; break;
+                    case 'h':
+                        numberFormat = littleEndian ? NumberFormat.Int16LE : NumberFormat.Int16BE; break;
+                }
+                result.push(buffer.getNumber(numberFormat, offset));
+                offset += pins.sizeOf(numberFormat);
+            }
+            return result;
+        }
+    }
+
     initialize();
 }
 
-namespace smbus {
-    export function writeByte(address: number, register: number, value: number): void {
-        let temp = pins.createBuffer(2);
-        temp[0] = register;
-        temp[1] = value;
-        pins.i2cWriteBuffer(address, temp, false);
-    }
-    export function writeBuffer(address: number, register: number, value: Buffer): void {
-        let temp = pins.createBuffer(value.length + 1);
-        temp[0] = register;
-        for (let index = 0; index < value.length; index++) {
-            temp[index + 1] = value[index];
-        }
-        pins.i2cWriteBuffer(address, temp, false);
-    }
-    export function readBuffer(address: number, register: number, length: number): Buffer {
-        let temp = pins.createBuffer(1);
-        temp[0] = register;
-        pins.i2cWriteBuffer(address, temp, false);
-        return pins.i2cReadBuffer(address, length, false);
-    }
-    export function readNumber(address: number, register: number, format: NumberFormat = NumberFormat.UInt8LE): number {
-        let temp = pins.createBuffer(1);
-        temp[0] = register;
-        pins.i2cWriteBuffer(address, temp, false);
-        return pins.i2cReadNumber(address, format, false);
-    }
-    export function unpack(format: string, buffer: Buffer): number[] {
-        let littleEndian: boolean = true;
-        let offset: number = 0;
-        let result: number[] = [];
-        let numberFormat: NumberFormat = 0;
-        for (let charIndex = 0; charIndex < format.length; charIndex++) {
-            switch (format.charAt(charIndex)) {
-                case '<':
-                    littleEndian = true;
-                    continue;
-                case '>':
-                    littleEndian = false;
-                    continue;
-                case 'c':
-                case 'B':
-                    numberFormat = littleEndian ? NumberFormat.UInt8LE : NumberFormat.UInt8BE; break;
-                case 'b':
-                    numberFormat = littleEndian ? NumberFormat.Int8LE : NumberFormat.Int8BE; break;
-                case 'H':
-                    numberFormat = littleEndian ? NumberFormat.UInt16LE : NumberFormat.UInt16BE; break;
-                case 'h':
-                    numberFormat = littleEndian ? NumberFormat.Int16LE : NumberFormat.Int16BE; break;
-            }
-            result.push(buffer.getNumber(numberFormat, offset));
-            offset += pins.sizeOf(numberFormat);
-        }
-        return result;
-    }
-}
