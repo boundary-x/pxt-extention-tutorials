@@ -1007,7 +1007,7 @@ namespace aiPonybot {
     /**
 * ---------------ai data parsing-------------------
 */
-    //% block="블루투스 수신 값: %data 에서 %type 추출"
+    //% block="블루투스 수신 값: %data 에서 %type 을 %format 으로 추출"
     //% group="AI 서비스 데이터 활용"
     //% weight=5
     export function parseUARTUnified(data: string, type: UARTDataType, format: ReturnFormat): any {
@@ -1023,7 +1023,7 @@ namespace aiPonybot {
     }
 
 
-    //% block="블루투스 수신 값: %data 에서 %color 추출"
+    //% block="블루투스 수신 값: %data 에서 %color 을 %format 으로 추출"
     //% group="AI 서비스 데이터 활용"
     //% weight=4
     export function parseColorUnified(data: string, color: ColorDataType, format: ReturnFormat): any {
@@ -1031,11 +1031,11 @@ namespace aiPonybot {
             return format == ReturnFormat.String ? data : -1
         }
 
-        let v = getValue(data, colorKey(color))
+        let w = getValue(data, colorKey(color))
 
-        if (format == ReturnFormat.String) return v
-        let num = parseInt(v)
-        return isNaN(num) ? -1 : num
+        if (format == ReturnFormat.String) return w
+        let num2 = parseInt(w)
+        return isNaN(num2) ? -1 : num2
     }
 
     // 공통 데이터 추출 함수
@@ -1044,11 +1044,11 @@ namespace aiPonybot {
         if (start < 0) return ""
         let end = data.length
         const keys = ["x", "y", "w", "h", "d", "R", "G", "B", "\n"]
-        for (let k of keys) {
-            if (k != key) {
-                const i = data.indexOf(k, start + 1)
-                if (i >= 0 && i < end) {
-                    end = i
+        for (let r of keys) {
+            if (r != key) {
+                const s = data.indexOf(r, start + 1)
+                if (s >= 0 && s < end) {
+                    end = s
                 }
             }
         }
