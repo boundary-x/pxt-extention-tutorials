@@ -77,32 +77,32 @@ namespace aiPonybot {
     }
 
     export enum Servo {
-        //% block="servo 1"
+        //% block="서보 1"
         Servo1 = 0x01,
-        //% block="servo 2"
+        //% block="서보 2"
         Servo2 = 0x02,
-        //% block="servo 3"
+        //% block="서보 3"
         Servo3 = 0x03,
-        //% block="servo 4"
+        //% block="서보 4"
         Servo4 = 0x04,
-        //% block="servo 5"
+        //% block="서보 5"
         Servo5 = 0x05,
-        //% block="servo 6"
+        //% block="서보 6"
         Servo6 = 0x06,
-        //% block="servo 7"
+        //% block="서보 7"
         Servo7 = 0x07,
-        //% block="servo 8"
+        //% block="서보 8"
         Servo8 = 0x08
     }
 
     export enum Motor {
-        //% block="motor 1"
+        //% block="모터 1"
         Motor1 = 0x1,
-        //% block="motor 2"
+        //% block="모터 2"
         Motor2 = 0x2,
-        //% block="motor 3"
+        //% block="모터 3"
         Motor3 = 0x3,
-        //% block="motor 4"
+        //% block="모터 4"
         Motor4 = 0x4
     }
 
@@ -1004,6 +1004,111 @@ namespace aiPonybot {
         clear();
     }
 
+    /**
+* ---------------ai data parsing-------------------
+*/
+    //% block="블루투스 수신 값: %data 에서 %type 추출"
+    //% group="AI 서비스 데이터 활용"
+    //% weight=5
+    export function parseUARTUnified(data: string, type: UARTDataType, format: ReturnFormat): any {
+        if (data == "null" || data == "stop") {
+            return format == ReturnFormat.String ? data : -1
+        }
+
+        let v = getValue(data, uartKey(type))
+
+        if (format == ReturnFormat.String) return v
+        let num = parseInt(v)
+        return isNaN(num) ? -1 : num
+    }
+
+
+    //% block="블루투스 수신 값: %data 에서 %color 추출"
+    //% group="AI 서비스 데이터 활용"
+    //% weight=4
+    export function parseColorUnified(data: string, color: ColorDataType, format: ReturnFormat): any {
+        if (data == "stop") {
+            return format == ReturnFormat.String ? data : -1
+        }
+
+        let v = getValue(data, colorKey(color))
+
+        if (format == ReturnFormat.String) return v
+        let num = parseInt(v)
+        return isNaN(num) ? -1 : num
+    }
+
+    // 공통 데이터 추출 함수
+    function getValue(data: string, key: string): string {
+        let start = data.indexOf(key)
+        if (start < 0) return ""
+        let end = data.length
+        const keys = ["x", "y", "w", "h", "d", "R", "G", "B", "\n"]
+        for (let k of keys) {
+            if (k != key) {
+                const i = data.indexOf(k, start + 1)
+                if (i >= 0 && i < end) {
+                    end = i
+                }
+            }
+        }
+        return data.substr(start + 1, end - start - 1)
+    }
+
+    // UART 데이터 타입
+    export enum UARTDataType {
+        //% block="X 좌표"
+        X,
+        //% block="Y 좌표"
+        Y,
+        //% block="너비"
+        W,
+        //% block="높이"
+        H,
+        //% block="객체 수"
+        D
+    }
+
+    // 색상 데이터 타입
+    export enum ColorDataType {
+        //% block="빨강 값"
+        R,
+        //% block="초록 값"
+        G,
+        //% block="파랑 값"
+        B
+    }
+
+    // 반환 형식
+    export enum ReturnFormat {
+        //% block="문자형"
+        String,
+        //% block="정수형"
+        Number
+    }
+
+    // 내부 함수: UARTDataType → 문자 키
+    function uartKey(type: UARTDataType): string {
+        switch (type) {
+            case UARTDataType.X: return "x"
+            case UARTDataType.Y: return "y"
+            case UARTDataType.W: return "w"
+            case UARTDataType.H: return "h"
+            case UARTDataType.D: return "d"
+            default: return ""
+        }
+    }
+
+    // 내부 함수: ColorDataType → 문자 키
+    function colorKey(color: ColorDataType): string {
+        switch (color) {
+            case ColorDataType.R: return "R"
+            case ColorDataType.G: return "G"
+            case ColorDataType.B: return "B"
+            default: return ""
+        }
+    }
+
     export namespace smbus {
         export function writeByte(address: number, register: number, value: number): void {
             let temp = pins.createBuffer(2);
@@ -1063,4 +1168,3 @@ namespace aiPonybot {
 
     initialize();
 }
-
