@@ -1005,11 +1005,12 @@ namespace aiPonybot {
     }
 
     /**
-* ---------------ai data parsing-------------------
-*/
-    //% block="블루투스 수신 값: %data 에서 %type 을 %format 으로 추출"
-    //% group="AI 서비스 데이터 활용"
-    //% weight=5
+ * AI data parsing
+ */
+
+    //% group="AI 데이터 활용"
+    //% block="블루투스 UART 수신 값: %data 에서 %type 을 %format 으로 추출"
+    //% weight=70
     export function parseUARTUnified(data: string, type: UARTDataType, format: ReturnFormat): any {
         if (data == "null" || data == "stop") {
             return format == ReturnFormat.String ? data : -1
@@ -1022,40 +1023,39 @@ namespace aiPonybot {
         return isNaN(num) ? -1 : num
     }
 
-
-    //% block="블루투스 수신 값: %data 에서 %color 을 %format 으로 추출"
-    //% group="AI 서비스 데이터 활용"
-    //% weight=4
+    //% group="AI 데이터 활용"
+    //% block="블루투스 UART 색상 값: %data 에서 %color 을 %format 으로 추출"
+    //% weight=69
     export function parseColorUnified(data: string, color: ColorDataType, format: ReturnFormat): any {
         if (data == "stop") {
             return format == ReturnFormat.String ? data : -1
         }
 
-        let w = getValue(data, colorKey(color))
+        let v = getValue(data, colorKey(color))
 
-        if (format == ReturnFormat.String) return w
-        let num2 = parseInt(w)
-        return isNaN(num2) ? -1 : num2
+        if (format == ReturnFormat.String) return v
+        let num = parseInt(v)
+        return isNaN(num) ? -1 : num
     }
 
-    // 공통 데이터 추출 함수
+
     function getValue(data: string, key: string): string {
         let start = data.indexOf(key)
         if (start < 0) return ""
         let end = data.length
         const keys = ["x", "y", "w", "h", "d", "R", "G", "B", "\n"]
-        for (let r of keys) {
-            if (r != key) {
-                const s = data.indexOf(r, start + 1)
-                if (s >= 0 && s < end) {
-                    end = s
+        for (let k of keys) {
+            if (k != key) {
+                const i = data.indexOf(k, start + 1)
+                if (i >= 0 && i < end) {
+                    end = i
                 }
             }
         }
         return data.substr(start + 1, end - start - 1)
     }
 
-    // UART 데이터 타입
+
     export enum UARTDataType {
         //% block="X 좌표"
         X,
@@ -1069,7 +1069,7 @@ namespace aiPonybot {
         D
     }
 
-    // 색상 데이터 타입
+
     export enum ColorDataType {
         //% block="빨강 값"
         R,
@@ -1079,7 +1079,6 @@ namespace aiPonybot {
         B
     }
 
-    // 반환 형식
     export enum ReturnFormat {
         //% block="문자형"
         String,
@@ -1087,7 +1086,6 @@ namespace aiPonybot {
         Number
     }
 
-    // 내부 함수: UARTDataType → 문자 키
     function uartKey(type: UARTDataType): string {
         switch (type) {
             case UARTDataType.X: return "x"
@@ -1099,7 +1097,6 @@ namespace aiPonybot {
         }
     }
 
-    // 내부 함수: ColorDataType → 문자 키
     function colorKey(color: ColorDataType): string {
         switch (color) {
             case ColorDataType.R: return "R"
