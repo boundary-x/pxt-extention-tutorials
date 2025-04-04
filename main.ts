@@ -1009,7 +1009,7 @@ namespace aiPonybot {
  */
 
     //% group="AI 데이터 활용"
-    //% block="블루투스 UART 수신 값: %data 에서 %type 을 %format 으로 추출"
+    //% block="블루투스 수신 값: %data 에서 %type 을 %format 으로 추출"
     //% weight=70
     export function parseUARTUnified(data: string, type: UARTDataType, format: ReturnFormat): any {
         if (data == "null" || data == "stop") {
@@ -1024,7 +1024,7 @@ namespace aiPonybot {
     }
 
     //% group="AI 데이터 활용"
-    //% block="블루투스 UART 색상 값: %data 에서 %color 을 %format 으로 추출"
+    //% block="블루투스 수신 값: %data 에서 %color 을 %format 으로 추출"
     //% weight=69
     export function parseColorUnified(data: string, color: ColorDataType, format: ReturnFormat): any {
         if (data == "stop") {
@@ -1071,11 +1071,11 @@ namespace aiPonybot {
 
 
     export enum ColorDataType {
-        //% block="빨강 값"
+        //% block="빨간색(R)"
         R,
-        //% block="초록 값"
+        //% block="초록색(G)"
         G,
-        //% block="파랑 값"
+        //% block="파란색(B)"
         B
     }
 
