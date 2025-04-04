@@ -1005,106 +1005,111 @@ namespace aiPonybot {
     }
 
     /**
- * AI data parsing
- */
+     * ai data parsing
+    */
+        // UART 데이터 파싱 블록
+        //% block="블루투스 수신 값: %data 에서 %type 을 %format 으로 추출"
+        //% inlineInputMode=inline
+        //% weight=70
+        export function parseUARTUnified(data: string, type: UARTDataType, format: ReturnFormat): any {
+            if (data == "null" || data == "stop") {
+                return format == ReturnFormat.String ? data : -1
+            }
 
-    //% group="AI 데이터 활용"
-    //% block="블루투스 수신 값: %data 에서 %type 을 %format 으로 추출"
-    //% weight=70
-    export function parseUARTUnified(data: string, type: UARTDataType, format: ReturnFormat): any {
-        if (data == "null" || data == "stop") {
-            return format == ReturnFormat.String ? data : -1
+            let v = getValue(data, uartKey(type))
+
+            if (format == ReturnFormat.String) return v
+            let num = parseInt(v)
+            return isNaN(num) ? -1 : num
         }
 
-        let v = getValue(data, uartKey(type))
+        // 색상 데이터 파싱 블록
+        //% block="블루투스 수신 값: %data 에서 %color 을 %format 으로 추출"
+        //% inlineInputMode=inline
+        //% weight=69
+        export function parseColorUnified(data: string, color: ColorDataType, format: ReturnFormat): any {
+            if (data == "stop") {
+                return format == ReturnFormat.String ? data : -1
+            }
 
-        if (format == ReturnFormat.String) return v
-        let num = parseInt(v)
-        return isNaN(num) ? -1 : num
-    }
+            let v = getValue(data, colorKey(color))
 
-    //% group="AI 데이터 활용"
-    //% block="블루투스 수신 값: %data 에서 %color 을 %format 으로 추출"
-    //% weight=69
-    export function parseColorUnified(data: string, color: ColorDataType, format: ReturnFormat): any {
-        if (data == "stop") {
-            return format == ReturnFormat.String ? data : -1
+            if (format == ReturnFormat.String) return v
+            let num = parseInt(v)
+            return isNaN(num) ? -1 : num
         }
 
-        let v = getValue(data, colorKey(color))
-
-        if (format == ReturnFormat.String) return v
-        let num = parseInt(v)
-        return isNaN(num) ? -1 : num
-    }
-
-
-    function getValue(data: string, key: string): string {
-        let start = data.indexOf(key)
-        if (start < 0) return ""
-        let end = data.length
-        const keys = ["x", "y", "w", "h", "d", "R", "G", "B", "\n"]
-        for (let k of keys) {
-            if (k != key) {
-                const i = data.indexOf(k, start + 1)
-                if (i >= 0 && i < end) {
-                    end = i
+        // 공통 문자열 파싱 함수
+        function getValue(data: string, key: string): string {
+            let start = data.indexOf(key)
+            if (start < 0) return ""
+            let end = data.length
+            const keys = ["x", "y", "w", "h", "d", "R", "G", "B", "\n"]
+            for (let k of keys) {
+                if (k != key) {
+                    const i = data.indexOf(k, start + 1)
+                    if (i >= 0 && i < end) {
+                        end = i
+                    }
                 }
             }
+            return data.substr(start + 1, end - start - 1)
         }
-        return data.substr(start + 1, end - start - 1)
-    }
 
-
-    export enum UARTDataType {
-        //% block="X 좌표"
-        X,
-        //% block="Y 좌표"
-        Y,
-        //% block="너비"
-        W,
-        //% block="높이"
-        H,
-        //% block="객체 수"
-        D
-    }
-
-
-    export enum ColorDataType {
-        //% block="빨간색(R)"
-        R,
-        //% block="초록색(G)"
-        G,
-        //% block="파란색(B)"
-        B
-    }
-
-    export enum ReturnFormat {
-        //% block="문자형"
-        String,
-        //% block="정수형"
-        Number
-    }
-
-    function uartKey(type: UARTDataType): string {
-        switch (type) {
-            case UARTDataType.X: return "x"
-            case UARTDataType.Y: return "y"
-            case UARTDataType.W: return "w"
-            case UARTDataType.H: return "h"
-            case UARTDataType.D: return "d"
-            default: return ""
+        // UART 데이터 타입
+        export enum UARTDataType {
+            //% block="X 좌표"
+            X,
+            //% block="Y 좌표"
+            Y,
+            //% block="너비"
+            W,
+            //% block="높이"
+            H,
+            //% block="객체 수"
+            D
         }
-    }
 
-    function colorKey(color: ColorDataType): string {
-        switch (color) {
-            case ColorDataType.R: return "R"
-            case ColorDataType.G: return "G"
-            case ColorDataType.B: return "B"
-            default: return ""
+        // 색상 데이터 타입
+        export enum ColorDataType {
+            //% block="빨간색(R)"
+            R,
+            //% block="초록색(G)"
+            G,
+            //% block="파란색(B)"
+            B
         }
-    }
+
+        // 반환 형식
+        export enum ReturnFormat {
+            //% block="문자형"
+            String,
+            //% block="정수형"
+            Number
+        }
+
+        // 내부 키 매핑
+        function uartKey(type: UARTDataType): string {
+            switch (type) {
+                case UARTDataType.X: return "x"
+                case UARTDataType.Y: return "y"
+                case UARTDataType.W: return "w"
+                case UARTDataType.H: return "h"
+                case UARTDataType.D: return "d"
+                default: return ""
+            }
+        }
+
+        function colorKey(color: ColorDataType): string {
+            switch (color) {
+                case ColorDataType.R: return "R"
+                case ColorDataType.G: return "G"
+                case ColorDataType.B: return "B"
+                default: return ""
+            }
+        }
+    
+
 
     export namespace smbus {
         export function writeByte(address: number, register: number, value: number): void {
